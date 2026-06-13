@@ -1,4 +1,4 @@
-# i18n Setup Guide
+# i18n Create Guide
 
 When a project has no i18n, follow this guide to create it from scratch.
 

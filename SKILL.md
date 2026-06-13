@@ -1,15 +1,17 @@
 ---
 name: polyglot
 description: >
-  One skill for the entire i18n journey. Sets up i18n from scratch OR migrates
-  hardcoded strings to translation calls with minimal diffs. Use when creating
-  i18n for the first time, or migrating strings across next-intl, react-i18next,
-  vue-i18n, react-intl, i18next, angular, svelte, or lingui. Does NOT translate
-  content, refactor existing i18n, or change component architecture.
+  One skill for the entire i18n journey. Creates i18n from scratch, migrates
+  hardcoded strings to translation calls, OR refactors existing i18n keys
+  with impact analysis. Use when creating i18n, migrating strings, or renaming
+  keys/namespaces across next-intl, react-i18next, vue-i18n, react-intl,
+  i18next, angular, svelte, or lingui. Does NOT translate content or change
+  component architecture.
 when_to_use: >
-  "add i18n", "setup i18n", "internationalize", "localize", "migrate strings",
-  "hardcoded text", "translate", "i18n this component", "add translation keys",
-  "create i18n", "configure i18n"
+  "add i18n", "create i18n", "setup i18n", "internationalize", "localize",
+  "migrate strings", "hardcoded text", "translate", "i18n this component",
+  "add translation keys", "configure i18n", "rename i18n keys", "refactor i18n",
+  "change namespace", "rename namespace"
 argument-hint: "[mode] [target]"
 arguments:
   - mode
@@ -35,10 +37,11 @@ hooks:
 
 # Polyglot
 
-One skill for the entire i18n journey.
+One skill for the entire i18n journey. Three modes:
 
-- **Setup** — create i18n from scratch when your project has none
+- **Create** — create i18n from scratch when your project has none
 - **Migrate** — surgically migrate hardcoded strings when i18n exists
+- **Refactor** — rename keys/namespaces safely with impact analysis
 
 ## Project Context
 
@@ -54,19 +57,20 @@ ls locales/*.json messages/*.json i18n/*.json 2>/dev/null | head -5 || echo "  N
 
 ## Arguments
 
-- **$mode**: `setup` (create from scratch) or `migrate` (migrate strings). Auto-detected if omitted.
-- **$target**: File(s) to migrate (migrate mode only)
+- **$mode**: `create`, `migrate`, or `refactor`. Auto-detected if omitted.
+- **$target**: File(s) to process (migrate/refactor mode)
 
 ## Routing
 
 1. Run discovery → [discovery.md](discovery.md)
-2. i18n detected → **Migrate**
-3. No i18n → **Setup**
-4. User passed explicit mode → follow it
+2. No i18n → **Create**
+3. i18n exists + user wants migrate → **Migrate**
+4. i18n exists + user wants rename/refactor → **Refactor**
+5. User passed explicit mode → follow it
 
 ## Scope Rules
 
-### Setup
+### Create
 - Create i18n architecture (providers, config, translation files)
 - Follow framework conventions
 - Minimal scaffolding — no over-engineering
@@ -78,6 +82,12 @@ ls locales/*.json messages/*.json i18n/*.json 2>/dev/null | head -5 || echo "  N
 - Do not alter business logic
 - Do not touch unrelated lines
 
+### Refactor
+- **Impact analysis is mandatory** before any change
+- **Explicit confirmation** required at each phase (analyze → preview → apply → validate)
+- Only rename keys/namespaces — do not change component logic
+- Report all cross-module dependencies
+
 ## Workflow
 
 ### Phase 1: Discover
@@ -86,12 +96,13 @@ Detect stack → [discovery.md](discovery.md). Low confidence → invoke `/i18n-
 
 ### Phase 2: Route
 
-- **Has i18n?** → Migrate
-- **No i18n?** → Setup
+- **No i18n?** → Create
+- **Migrate strings?** → Migrate
+- **Rename keys/namespaces?** → Refactor
 
-### Phase 3A: Setup
+### Phase 3A: Create
 
-Follow [setup.md](setup.md):
+Follow [create.md](create.md):
 1. Recommend library based on framework
 2. Install dependencies
 3. Create config + translation files
@@ -102,12 +113,20 @@ Follow [setup.md](setup.md):
 
 Read reference + target + translation files. Extract: hook pattern, key convention, reusable keys.
 
-### Phase 4: Identify (Migrate)
+### Phase 3C: Refactor
+
+Follow [refactor.md](refactor.md):
+1. **Impact Analysis** — find all usages, cross-module dependencies, blast radius
+2. **Preview** — show exact diff, list all files to change
+3. **Apply** — rename in all components + translation files
+4. **Validate** — check for orphaned references, run validation
+
+### Phase 4: Identify (Migrate only)
 
 Find: labels, placeholders, errors, aria-labels, tooltips, buttons.
 Exclude: constants, logs, identifiers, CSS, data attributes.
 
-### Phase 5: Apply Patterns (Migrate)
+### Phase 5: Apply Patterns (Migrate only)
 
 Follow [patterns.md](patterns.md): interpolation, pluralization, formatting, rich text.
 Smallest change only: replace strings, add hook/import if absent.
@@ -124,16 +143,15 @@ Auto-runs via Stop hook. Fix errors → re-validate.
 ### Phase 8: Respond
 
 ```
-Mode: [setup|migrate]
+Mode: [create|migrate|refactor]
 
 Files changed:
 - path/to/file.tsx
 
 Changes:
-- [setup] created i18n config with [library]
+- [create] created i18n config with [library]
 - [migrate] migrated N strings
-- reused: [key.one]
-- added: [key.two]
+- [refactor] renamed X keys across Y files
 
 Validation: ✓ passed
 
@@ -161,11 +179,12 @@ Batch by section. Ask scope. One batch at a time.
 | Detection fails | Auto-invoke `/i18n-analyzer` |
 | Pattern unclear | Ask before proceeding |
 | Validation fails | Fix, re-validate |
-| No i18n + user wants migrate | Suggest setup first |
+| Refactor impact too high | Abort, suggest manual approach |
 
 ## Resources
 
 - [discovery.md](discovery.md) — Detection + routing
-- [setup.md](setup.md) — Scaffolding per library
+- [create.md](create.md) — Scaffolding per library
+- [refactor.md](refactor.md) — Safe refactoring with impact analysis
 - [patterns.md](patterns.md) — Interpolation, pluralization, Bom/Ruim
 - [examples.md](examples.md) — Before/after for every library

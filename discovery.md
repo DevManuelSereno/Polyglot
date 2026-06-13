@@ -63,10 +63,10 @@ After detection, determine the mode:
 
 | Condition | Mode | Action |
 |-----------|------|--------|
-| Library detected + translation files exist | **Migrate** | Follow migrate workflow |
-| Library detected + no translation files | **Migrate** (partial) | Ask about storage method |
-| No library detected + user wants i18n | **Setup** | Follow setup workflow |
-| No library detected + user wants migration | **Error** | Ask to setup i18n first |
+| No i18n detected | **Create** | Follow create workflow |
+| i18n detected + user wants migrate strings | **Migrate** | Follow migrate workflow |
+| i18n detected + user wants rename/refactor keys | **Refactor** | Follow refactor workflow |
+| i18n detected + mode unclear | **Ask** | Clarify user intent |
 
 ## Error Handling
 

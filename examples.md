@@ -222,3 +222,89 @@ Changes:
 
 Validation: ✓ passed
 ```
+
+## Refactor Example
+
+**Scenario:** Rename namespace `bloqueio` → `block` across the codebase
+
+**Before:**
+```tsx
+// src/components/BlockedAccount.tsx
+const t = useTranslations('bloqueio');
+<h1>{t('bloqueio.titulo')}</h1>
+<p>{t('bloqueio.mensagem')}</p>
+```
+
+**Impact Analysis:**
+```
+## Impact Analysis
+
+**Target**: `bloqueio.*` → `block.*`
+
+**Found 12 usages across 4 files:**
+- src/components/BlockedAccount.tsx (2 usages)
+- src/components/BlockedCard.tsx (3 usages)
+- src/shared/hooks/useBlockedStatus.ts (1 usage)
+- src/pages/AccountStatus.tsx (6 usages)
+
+**Cross-module dependencies:**
+- src/shared/hooks/useBlockedStatus.ts (imported by 3 other modules)
+
+**Risk level:** MEDIUM (shared hook affected)
+
+**Confidence:** High
+```
+
+**Preview:**
+```
+## Preview
+
+**Files to change (4 total):**
+
+### src/components/BlockedAccount.tsx
+```diff
+- const t = useTranslations('bloqueio');
++ const t = useTranslations('block');
+
+- <h1>{t('bloqueio.titulo')}</h1>
++ <h1>{t('block.titulo')}</h1>
+
+- <p>{t('bloqueio.mensagem')}</p>
++ <p>{t('block.mensagem')}</p>
+```
+
+### src/components/BlockedCard.tsx
+...
+
+**Translation keys to rename:**
+- `bloqueio.titulo` → `block.titulo`
+- `bloqueio.mensagem` → `block.mensagem`
+- `bloqueio.botaoDesbloquear` → `block.unlockButton`
+
+**Apply these changes? [y/N]**
+```
+
+**After (user confirms):**
+```tsx
+// src/components/BlockedAccount.tsx
+const t = useTranslations('block');
+<h1>{t('block.titulo')}</h1>
+<p>{t('block.mensagem')}</p>
+```
+
+**Response:**
+```
+Mode: refactor
+
+Files changed:
+- src/components/BlockedAccount.tsx
+- src/components/BlockedCard.tsx
+- src/shared/hooks/useBlockedStatus.ts
+- src/pages/AccountStatus.tsx
+
+Changes:
+- renamed 3 keys across 4 files
+- namespace: bloqueio → block
+
+Validation: ✓ passed (0 orphaned references)
+```

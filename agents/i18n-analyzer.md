@@ -43,8 +43,9 @@ Analyze the i18n setup in this project. Report findings with confidence levels a
    - Prefer files with 5+ translation keys
 
 7. **Recommend mode**
-   - If i18n detected → recommend **Migrate** mode
-   - If no i18n → recommend **Setup** mode
+   - If no i18n detected → recommend **Create** mode
+   - If i18n detected + user wants migrate strings → recommend **Migrate** mode
+   - If i18n detected + user wants rename/refactor → recommend **Refactor** mode
    - Report reasoning
 
 ## Output Format

@@ -41,8 +41,9 @@ export default function SettingsPage() {
 
 Polyglot is a Claude Code / opencode skill that handles the full i18n lifecycle:
 
-- **No i18n yet?** → Sets it up from scratch (library, config, provider, translation files)
+- **No i18n yet?** → Creates it from scratch (library, config, provider, translation files)
 - **i18n exists?** → Surgically migrates hardcoded strings with minimal diffs
+- **Need to rename keys?** → Safely refactors with impact analysis and validation
 
 It auto-detects your project's state and routes to the right workflow. No manual configuration needed.
 
@@ -62,15 +63,16 @@ Works with Claude Code, opencode, and any Agent Skills-compatible tool.
 /polyglot
 
 # Force a mode
-/polyglot setup
+/polyglot create
 /polyglot migrate src/Settings.tsx src/Profile.tsx
+/polyglot refactor bloqueio block
 ```
 
-Or just ask naturally: *"Add i18n to my app"* or *"Migrate strings in Settings.tsx"*
+Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx"*, or *"Rename bloqueio namespace to block"*
 
 ## What it does
 
-### Setup mode (no i18n yet)
+### Create mode (no i18n yet)
 - Recommends library based on your framework
 - Installs dependencies
 - Creates config, translation files, provider
@@ -81,6 +83,13 @@ Or just ask naturally: *"Add i18n to my app"* or *"Migrate strings in Settings.t
 - Replaces with `t()` calls following existing patterns
 - Updates translation files or outputs keys for remote storage
 - Validates automatically
+
+### Refactor mode (rename keys/namespaces)
+- Analyzes impact across entire codebase
+- Shows blast radius and cross-module dependencies
+- Requires explicit confirmation before applying
+- Renames keys/namespaces safely
+- Validates for orphaned references
 
 ## What it does NOT do
 
@@ -106,7 +115,7 @@ Or just ask naturally: *"Add i18n to my app"* or *"Migrate strings in Settings.t
 ## How it works
 
 1. **Discover** — detects your i18n stack with confidence levels (High/Medium/Low)
-2. **Route** — has i18n? → Migrate. No i18n? → Setup.
+2. **Route** — no i18n? → Create. Migrate strings? → Migrate. Rename keys? → Refactor.
 3. **Execute** — follows the appropriate workflow
 4. **Validate** — auto-runs validation hook after every file change
 5. **Respond** — structured summary with files changed, keys added, validation status
@@ -119,14 +128,15 @@ See [examples.md](examples.md) for concrete patterns across all libraries.
 
 ```
 polyglot/
-├── SKILL.md              # Core routing + workflow (150 lines)
+├── SKILL.md              # Core routing + workflow (170 lines)
 ├── discovery.md          # Stack detection with confidence levels
-├── setup.md              # Opinionated scaffolding per library
+├── create.md             # Opinionated scaffolding per library
+├── refactor.md           # Safe refactoring with impact analysis
 ├── patterns.md           # Interpolation, pluralization, formatting + Bom/Ruim
 ├── examples.md           # Before/after for every library
 ├── agents/
 │   └── i18n-analyzer.md  # Deep analysis subagent
-├── scripts/
+── scripts/
 │   └── validate-keys.js  # Auto-validates translation files
 ├── README.md
 └── LICENSE
@@ -139,7 +149,8 @@ polyglot/
 | Detection fails | Auto-invokes `/i18n-analyzer` subagent |
 | Pattern unclear | Asks before proceeding |
 | Validation fails | Fixes errors, re-validates |
-| No i18n + user wants migrate | Suggests setup first |
+| Refactor impact too high | Warns user, suggests manual approach |
+| No i18n + user wants migrate | Suggests create first |
 | Translation files missing | Asks for storage method |
 
 ## Confidence levels
