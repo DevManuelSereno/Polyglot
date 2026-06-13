@@ -3,7 +3,11 @@ name: i18n-analyzer
 description: Deep analysis of i18n patterns in a codebase. Auto-invoked when detection fails.
 context: fork
 agent: Explore
-allowed-tools: Read Grep Glob Bash(node *)
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash(node *)
 ---
 
 Analyze the i18n setup in this project. Report findings with confidence levels.

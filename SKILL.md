@@ -1,11 +1,23 @@
 ---
 name: i18n-migrator
 description: Surgical i18n migration with minimal diffs. Migrates hardcoded strings to translation calls.
-when_to_use: "add i18n", "migrate strings", "hardcoded text", "translate", "localize"
+when_to_use: >
+  "add i18n", "migrate strings", "hardcoded text", "translate", "localize"
 argument-hint: "[target] [reference]"
-arguments: [target, reference]
-allowed-tools: Read Grep Glob Edit Bash(node *)
-paths: ["**/*.{tsx,jsx,vue,svelte,ts,js}", "**/locales/**", "**/messages/**", "**/i18n/**"]
+arguments:
+  - target
+  - reference
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Edit
+  - Bash(node *)
+paths:
+  - "**/*.{tsx,jsx,vue,svelte,ts,js}"
+  - "**/locales/**"
+  - "**/messages/**"
+  - "**/i18n/**"
 hooks:
   post-invocation:
     - command: "node ${CLAUDE_SKILL_DIR}/scripts/validate-keys.js $(find locales messages i18n -type d 2>/dev/null | head -1)"
