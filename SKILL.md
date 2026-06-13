@@ -5,8 +5,8 @@ description: >
   hardcoded strings to translation calls, OR refactors existing i18n keys
   with impact analysis. Use when creating i18n, migrating strings, or renaming
   keys/namespaces across next-intl, react-i18next, vue-i18n, react-intl,
-  i18next, angular, svelte, or lingui. Does NOT translate content or change
-  component architecture.
+  i18next, angular, svelte, or lingui. Does NOT translate content, change
+  component architecture, or refactor non-i18n code.
 when_to_use: >
   "add i18n", "create i18n", "setup i18n", "internationalize", "localize",
   "migrate strings", "hardcoded text", "translate", "i18n this component",
@@ -168,7 +168,7 @@ Notes:
 **Good**: `profile.header.title`, `profile:header.title`
 **Bad**: `title`, `headerText`, `page.content.section.label.text`
 
-## Large Files (20+ strings)
+## Large Files (20+ strings, Migrate mode only)
 
 Batch by section. Ask scope. One batch at a time.
 
@@ -190,3 +190,4 @@ Batch by section. Ask scope. One batch at a time.
 - [refactor.md](refactor.md) — Safe refactoring with impact analysis
 - [patterns.md](patterns.md) — Interpolation, pluralization, Bom/Ruim
 - [examples.md](examples.md) — Before/after for every library
+- [agents/i18n-analyzer.md](agents/i18n-analyzer.md) — Deep analysis subagent

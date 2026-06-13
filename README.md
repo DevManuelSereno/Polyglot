@@ -50,9 +50,11 @@ It auto-detects your project's state and routes to the right workflow. No manual
 ## Install
 
 ```bash
-git clone https://github.com/DevManuelSereno/i18n-migrator.git
-cp -r i18n-migrator ~/.claude/skills/polyglot
+git clone https://github.com/DevManuelSereno/polyglot.git
+cp -r polyglot ~/.claude/skills/polyglot
 ```
+
+> **Note:** The repository was originally named `i18n-migrator` but was renamed to `polyglot` to reflect the skill's broader scope (create, migrate, refactor).
 
 Works with Claude Code, opencode, and any Agent Skills-compatible tool.
 
@@ -128,7 +130,7 @@ See [examples.md](examples.md) for concrete patterns across all libraries.
 
 ```
 polyglot/
-── SKILL.md              # Core routing + workflow (192 lines)
+├── SKILL.md              # Core routing + workflow (192 lines)
 ├── discovery.md          # Stack detection with confidence levels
 ├── create.md             # Opinionated scaffolding per library
 ├── refactor.md           # Safe refactoring with impact analysis
@@ -138,7 +140,7 @@ polyglot/
 │   └── i18n-analyzer.md  # Deep analysis subagent
 ├── scripts/
 │   └── validate-keys.js  # Auto-validates translation files
-├── README.md
+── README.md
 └── LICENSE
 ```
 

@@ -68,6 +68,28 @@ export default getRequestConfig(async ({ locale }) => ({
 
 ### react-i18next
 
+**ESM (modern projects):**
+```ts
+// src/i18n.ts
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import en from './locales/en.json';
+import pt from './locales/pt.json';
+
+i18n.use(initReactI18next).init({
+  resources: {
+    en: { translation: en },
+    pt: { translation: pt },
+  },
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: { escapeValue: false },
+});
+
+export default i18n;
+```
+
+**CommonJS (older projects):**
 ```ts
 // src/i18n.ts
 import i18n from 'i18next';
@@ -88,6 +110,23 @@ export default i18n;
 
 ### vue-i18n
 
+**ESM (modern projects):**
+```ts
+// src/i18n.ts
+import { createI18n } from 'vue-i18n';
+import en from './locales/en.json';
+import pt from './locales/pt.json';
+
+const i18n = createI18n({
+  locale: 'en',
+  fallbackLocale: 'en',
+  messages: { en, pt },
+});
+
+export default i18n;
+```
+
+**CommonJS (older projects):**
 ```ts
 // src/i18n.ts
 import { createI18n } from 'vue-i18n';
@@ -275,7 +314,7 @@ After create, guide the user:
 
 1. **Migrate strings**: Run `/polyglot migrate src/components/Settings.tsx` to start migrating
 2. **Add locales**: Copy `en.json` to new locale files and translate
-3. **Consider TMS**: For 3+ locales, consider Lokalise, Crowdin, or Phrase
+3. **Consider a Translation Management System (TMS)**: For 3+ locales, consider Lokalise, Crowdin, or Phrase
 
 ## Validation
 

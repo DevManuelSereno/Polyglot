@@ -90,13 +90,15 @@ function extractI18nKeys(files) {
   const namespaces = new Set();
   
   // Patterns to match:
-  // t('key'), t("key"), t(`key`)
+  // t('key'), t("key"), t(`key`) — but NOT setTimeout, setInterval, etc.
   // $t('key'), $t("key"), $t(`key`)
+  // i18n.t('key'), i18n.t("key"), i18n.t(`key`)
   // formatMessage({ id: 'key' }), formatMessage({id: "key"})
   // useTranslations('namespace'), useTranslation('namespace')
   const patterns = [
-    /\bt\(['"`]([^'"`]+)['"`]\)/g,
+    /(?<!\w)\bt\(['"`]([^'"`]+)['"`]\)/g,  // Negative lookbehind to avoid setTimeout, etc.
     /\$t\(['"`]([^'"`]+)['"`]\)/g,
+    /i18n\.t\(['"`]([^'"`]+)['"`]\)/g,
     /formatMessage\(\s*\{\s*id:\s*['"`]([^'"`]+)['"`]/g,
     /useTranslations?\(['"`]([^'"`]+)['"`]\)/g,
   ];

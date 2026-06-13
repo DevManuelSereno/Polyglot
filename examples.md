@@ -279,7 +279,7 @@ const t = useTranslations('bloqueio');
 **Translation keys to rename:**
 - `bloqueio.titulo` → `block.titulo`
 - `bloqueio.mensagem` → `block.mensagem`
-- `bloqueio.botaoDesbloquear` → `block.unlockButton`
+- `bloqueio.botaoDesbloquear` → `block.botaoDesbloquear`
 
 **Apply these changes? [y/N]**
 ```

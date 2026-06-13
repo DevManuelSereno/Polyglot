@@ -92,7 +92,7 @@ Strings appear in different positions in JSX. Each has specific handling:
 - Do not skip aria-labels, titles, or placeholders — they are user-visible.
 - Exclude: CSS class names, data attributes, event handler names, non-visible debug strings.
 
-## Large Files Strategy
+## Large Files Strategy (Migrate mode only)
 
 When a module has many hardcoded strings (20+):
 
