@@ -1,48 +1,193 @@
-# i18n Maintainer
+# i18n-migrator
 
 > Surgical i18n migration with minimal diffs for production codebases.
 
-A Claude Code / opencode skill that turns hardcoded strings into i18n calls — and nothing else.
+A Claude Code / opencode skill that turns hardcoded strings into i18n translation calls — and nothing else.
 
-## Features
+## Why Use This?
 
-- **Auto-detects** i18n library, storage, and conventions with confidence levels
-- **Minimal diffs** — only touches what's needed
-- **7-phase workflow** — structured, repeatable, predictable
-- **Auto-validation** — hooks validate translation files automatically
-- **Error handling** — clear fallbacks for every failure mode
-- **8+ libraries** — next-intl, react-i18next, vue-i18n, react-intl, i18next, angular, svelte, lingui
+When you need to migrate hardcoded strings to i18n in an existing codebase, you want:
+
+- **Minimal diffs** — only the strings change, nothing else
+- **Consistency** — follow existing patterns, don't invent new ones
+- **Safety** — validate translation files automatically
+- **Speed** — auto-detect your stack, no manual configuration
+
+This skill does exactly that. It's not a tutorial, not a setup guide, not a refactoring tool. It's a surgical instrument for i18n migration.
 
 ## Installation
 
+### Claude Code
+
 ```bash
-# Claude Code (personal)
-cp -r i18n-skill ~/.claude/skills/i18n-maintainer
+# Clone the repo
+git clone https://github.com/DevManuelSereno/i18n-migrator.git
 
-# Claude Code (project)
-cp -r i18n-skill /path/to/project/.claude/skills/i18n-maintainer
+# Install as personal skill (available in all projects)
+cp -r i18n-migrator ~/.claude/skills/i18n-migrator
 
-# opencode
-cp -r i18n-skill /path/to/project/.opencode/skills/i18n-maintainer
+# Or install in a specific project
+cp -r i18n-migrator /path/to/project/.claude/skills/i18n-migrator
 ```
+
+### opencode
+
+```bash
+cp -r i18n-migrator /path/to/project/.opencode/skills/i18n-migrator
+```
+
+### Requirements
+
+- Node.js 18+ (for validation script)
+- Claude Code 2.1.145+ or opencode with skill support
 
 ## Usage
 
+### Basic Migration
+
 ```bash
-# With arguments
-/i18n-maintainer src/Settings.tsx src/Profile.tsx
+# In your Claude Code session
+/i18n-migrator src/components/Settings.tsx src/components/Profile.tsx
+```
 
-# Auto-detect (Claude invokes automatically)
+The first argument is the **target** (file to migrate), the second is the **reference** (already-migrated file to follow as pattern).
+
+### Auto-Detect
+
+If you don't provide a reference file, the skill will detect patterns from your project:
+
+```bash
 Add i18n to src/components/Settings.tsx
+```
 
-# Deep analysis
+### Deep Analysis
+
+If the skill can't detect your i18n setup automatically, invoke the analyzer:
+
+```bash
 /i18n-analyzer
 ```
 
-## Structure
+This runs in an isolated agent and reports your full i18n configuration with confidence levels.
+
+## What It Does
+
+### Supported Libraries
+
+| Library | Status |
+|---------|--------|
+| next-intl | ✓ |
+| react-i18next | ✓ |
+| i18next | ✓ |
+| react-intl / FormatJS | ✓ |
+| vue-i18n | ✓ |
+| @angular/localize | ✓ |
+| svelte-i18n | ✓ |
+| lingui | ✓ |
+
+### Supported Patterns
+
+- **Simple strings** — labels, buttons, titles, placeholders
+- **Interpolation** — `"Hello, {name}"` → `t('greeting', { name })`
+- **Pluralization** — `count === 1 ? '1 item' : 'N items'` → `t('items', { count })`
+- **Formatting** — dates, numbers, currencies via library utilities
+- **Rich text** — `<Trans>Click <b>here</b></Trans>`
+- **JSX contexts** — children, attributes, aria-labels, conditionals
+
+### What It Does NOT Do
+
+- Set up i18n from scratch
+- Refactor existing i18n code
+- Improve translations or wording
+- Change component architecture
+- Modify files outside scope
+
+## Workflow
+
+The skill follows a 7-phase workflow:
+
+1. **Discover** — detect stack with confidence levels (High/Medium/Low)
+2. **Analyze** — read reference + target + translation files
+3. **Identify** — find hardcoded strings
+4. **Migrate** — apply patterns (interpolation, pluralization, etc.)
+5. **Update** — modify translation files or output keys
+6. **Validate** — auto-run validation via hook
+7. **Respond** — structured summary
+
+### Confidence Levels
+
+Every detection reports confidence:
+
+- **High** — found imports + config + multiple examples
+- **Medium** — found one signal or inferred from code
+- **Low** — guessed from patterns, needs confirmation
+
+If any detection is Low confidence, the skill asks before proceeding.
+
+## Example
+
+### Before
+
+```tsx
+// src/components/Settings.tsx
+export default function SettingsPage() {
+  return (
+    <div>
+      <h1>Settings</h1>
+      <p>Configure your preferences</p>
+      <button>Save</button>
+    </div>
+  );
+}
+```
+
+### Command
+
+```bash
+/i18n-migrator src/components/Settings.tsx src/components/Profile.tsx
+```
+
+### After
+
+```tsx
+// src/components/Settings.tsx
+import { useTranslations } from 'next-intl';
+
+export default function SettingsPage() {
+  const t = useTranslations('settings');
+  return (
+    <div>
+      <h1>{t('header.title')}</h1>
+      <p>{t('header.subtitle')}</p>
+      <button>{t('actions.save')}</button>
+    </div>
+  );
+}
+```
+
+### Output
 
 ```
-i18n-maintainer/
+Files changed:
+- src/components/Settings.tsx
+
+Changes:
+- migrated 3 strings to t() calls
+- added: [settings.header.title, settings.header.subtitle, settings.actions.save]
+- namespace: settings
+
+New keys to add:
+  settings.header.title: "Settings" (en)
+  settings.header.subtitle: "Configure your preferences" (en)
+  settings.actions.save: "Save" (en)
+
+Validation: ✓ passed
+```
+
+## Project Structure
+
+```
+i18n-migrator/
 ├── SKILL.md              # Core instructions (134 lines)
 ├── discovery.md          # Stack detection with confidence levels
 ├── patterns.md           # Interpolation, pluralization, formatting
@@ -55,16 +200,6 @@ i18n-maintainer/
 └── LICENSE
 ```
 
-## Workflow (7 Phases)
-
-1. **Discover** — detect stack with confidence levels
-2. **Analyze** — read reference + target + translation files
-3. **Identify** — find hardcoded strings
-4. **Migrate** — apply patterns (interpolation, pluralization, etc.)
-5. **Update** — modify translation files or output keys
-6. **Validate** — auto-run via hook, fix errors
-7. **Respond** — structured summary
-
 ## Error Handling
 
 | Scenario | Action |
@@ -72,44 +207,56 @@ i18n-maintainer/
 | Detection fails | Auto-invoke `/i18n-analyzer` |
 | Pattern unclear | Ask before proceeding |
 | Validation fails | Fix errors, re-validate |
-| Reference missing | Detect from project files |
-| Files missing | Ask user for storage method |
+| Reference not provided | Detect from project files |
+| Translation files missing | Ask user for storage method |
 
-## What It Handles
+## Troubleshooting
 
-- Simple strings (labels, buttons, titles)
-- String interpolation (`"Hello, {name}"`)
-- Pluralization (`"1 item"` / `"5 items"`)
-- Date/number/currency formatting
-- Rich text and inline components
-- JSX contexts (children, attributes, aria-labels)
-- Large modules (20+ strings — proposes batching)
+### "No translation files found"
 
-## What It Does NOT Do
+The skill looked in `locales/`, `messages/`, `i18n/`, `lang/`, `translations/`, `public/`. If your files are elsewhere, tell the skill:
 
-- Set up i18n from scratch
-- Refactor existing i18n code
-- Improve translations or wording
-- Change component architecture
-- Modify files outside scope
+```
+Translation files are in src/i18n/locales/
+```
 
-## Confidence Levels
+### "Cannot detect i18n library"
 
-Every detection reports confidence:
+Run the analyzer manually:
 
-- **High** — found imports + config + multiple examples
-- **Medium** — found one signal or inferred from code
-- **Low** — guessed from patterns, needs confirmation
+```bash
+/i18n-analyzer
+```
 
-If any detection is Low confidence, the skill asks before proceeding.
+Or tell the skill directly:
+
+```
+We use react-i18next with JSON files in locales/
+```
+
+### Validation fails with "Missing keys"
+
+The skill will automatically fix missing keys in translation files. If it can't, it will report which keys are missing and in which files.
+
+### Large files (20+ strings)
+
+The skill will propose batching by logical section (header, form, footer) and ask for scope confirmation before proceeding.
 
 ## Contributing
 
-Contributions welcome:
+Contributions welcome! Areas where help is needed:
+
 - Additional library examples (Solid, Qwik, etc.)
 - More validation rules
 - Translations of this README
 - Feedback from real-world usage
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## License
 

@@ -1,5 +1,5 @@
 ---
-name: i18n-maintainer
+name: i18n-migrator
 description: Surgical i18n migration with minimal diffs. Migrates hardcoded strings to translation calls.
 when_to_use: "add i18n", "migrate strings", "hardcoded text", "translate", "localize"
 argument-hint: "[target] [reference]"
@@ -11,7 +11,7 @@ hooks:
     - command: "node ${CLAUDE_SKILL_DIR}/scripts/validate-keys.js $(find locales messages i18n -type d 2>/dev/null | head -1)"
 ---
 
-# i18n Maintainer
+# i18n Migrator
 
 Surgical i18n migration. Make the minimum correct change. Consistency > optimization.
 
