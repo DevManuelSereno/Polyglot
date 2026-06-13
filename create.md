@@ -271,7 +271,7 @@ export default function Example() {
 
 ## Step 7: Next Steps
 
-After setup, guide the user:
+After create, guide the user:
 
 1. **Migrate strings**: Run `/polyglot migrate src/components/Settings.tsx` to start migrating
 2. **Add locales**: Copy `en.json` to new locale files and translate
@@ -279,7 +279,7 @@ After setup, guide the user:
 
 ## Validation
 
-After setup, validate:
+After create, validate:
 
 ```bash
 node ${CLAUDE_SKILL_DIR}/scripts/validate-keys.js locales

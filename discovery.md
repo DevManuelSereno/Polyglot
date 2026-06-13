@@ -19,7 +19,7 @@ Search for imports and config files:
 | svelte-i18n | `import { _ } from 'svelte-i18n'`, `$_()` in templates | High |
 | lingui | `import { t } from '@lingui/macro'`, `lingui.config.*` | High |
 
-**Fallback**: If no library detected, ask user which i18n system to use (for Setup mode).
+**Fallback**: If no library detected, ask user which i18n system to use (for Create mode).
 
 ### 2. Detect Translation Storage
 
@@ -80,7 +80,7 @@ If any detection step fails:
 ```
 ## Detection Results
 
-**Mode**: [setup|migrate]
+**Mode**: [create|migrate|refactor]
 **Library**: [name] (confidence: High/Medium/Low)
 **Storage**: [local/remote/hybrid] (confidence: High/Medium/Low)
 **Key convention**: [separator] + [structure] + [casing] (confidence: High/Medium/Low)

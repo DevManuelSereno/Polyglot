@@ -94,10 +94,10 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 ## What it does NOT do
 
 - Translate your content (use Lokalise, Crowdin, DeepL)
-- Refactor existing i18n code
-- Change component architecture
+- Change component architecture or business logic
 - Modify files outside the requested scope
 - Set up translation management workflows
+- Refactor non-i18n code (only renames i18n keys/namespaces)
 
 ## Supported libraries
 
@@ -116,9 +116,9 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 
 1. **Discover** — detects your i18n stack with confidence levels (High/Medium/Low)
 2. **Route** — no i18n? → Create. Migrate strings? → Migrate. Rename keys? → Refactor.
-3. **Execute** — follows the appropriate workflow
-4. **Validate** — auto-runs validation hook after every file change
-5. **Respond** — structured summary with files changed, keys added, validation status
+3. **Execute** — follows the appropriate workflow (create/migrate/refactor)
+4. **Validate** — auto-runs validation at end of turn (checks missing keys, orphaned references, variable consistency)
+5. **Respond** — structured summary with files changed, keys added/renamed, validation status
 
 ## Before/after examples
 
@@ -128,7 +128,7 @@ See [examples.md](examples.md) for concrete patterns across all libraries.
 
 ```
 polyglot/
-├── SKILL.md              # Core routing + workflow (170 lines)
+── SKILL.md              # Core routing + workflow (192 lines)
 ├── discovery.md          # Stack detection with confidence levels
 ├── create.md             # Opinionated scaffolding per library
 ├── refactor.md           # Safe refactoring with impact analysis
@@ -136,7 +136,7 @@ polyglot/
 ├── examples.md           # Before/after for every library
 ├── agents/
 │   └── i18n-analyzer.md  # Deep analysis subagent
-── scripts/
+├── scripts/
 │   └── validate-keys.js  # Auto-validates translation files
 ├── README.md
 └── LICENSE

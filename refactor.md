@@ -116,7 +116,7 @@ Safe refactoring of i18n keys and namespaces with mandatory impact analysis.
 **Goal:** Ensure nothing broke.
 
 **Steps:**
-1. Run `validate-keys.js` to check translation file consistency
+1. Run `validate-keys.js` to check translation file consistency (includes orphaned reference detection)
 2. Search for orphaned references (old key names still in code)
 3. Report any issues found
 4. If issues found, fix them or report to user

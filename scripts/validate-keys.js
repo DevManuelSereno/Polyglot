@@ -46,13 +46,13 @@ function findLocalesDir() {
 }
 
 function findSourceDir() {
-  const candidates = ['src', 'app', 'components', 'pages', '.'];
+  const candidates = ['src', 'app'];
   for (const dir of candidates) {
-    if (fs.existsSync(dir) && dir !== '.') {
+    if (fs.existsSync(dir)) {
       return dir;
     }
   }
-  return '.';
+  return null;
 }
 
 function scanSourceFiles(sourceDir) {
@@ -149,7 +149,17 @@ function validate(localesDir, sourceDir) {
     const filePath = path.join(localesDir, file);
     try {
       const content = fs.readFileSync(filePath, 'utf8');
-      const parsed = file.endsWith('.json') ? JSON.parse(content) : require('js-yaml').load(content);
+      let parsed;
+      if (file.endsWith('.json')) {
+        parsed = JSON.parse(content);
+      } else if (file.endsWith('.yaml') || file.endsWith('.yml')) {
+        try {
+          parsed = require('js-yaml').load(content);
+        } catch (yamlErr) {
+          errors.push(`${file}: YAML parsing requires js-yaml package. Install with: npm install js-yaml`);
+          continue;
+        }
+      }
       const keys = flattenKeys(parsed);
       allKeys[file] = keys;
 
@@ -199,7 +209,7 @@ function validate(localesDir, sourceDir) {
     }
   }
 
-  // Check for orphaned references (if source directory exists)
+  // Check for orphaned references (if source directory provided or auto-detected)
   if (sourceDir && fs.existsSync(sourceDir)) {
     console.log(`\nScanning source files in: ${sourceDir}`);
     const sourceFiles = scanSourceFiles(sourceDir);
@@ -238,7 +248,7 @@ function validate(localesDir, sourceDir) {
   console.log(`Files: ${files.length}, Keys: ${allKeyNames.size}\n`);
 
   if (errors.length > 0) {
-    console.log(' ERRORS:');
+    console.log('❌ ERRORS:');
     errors.forEach(e => console.log(`  ${e}`));
   }
 

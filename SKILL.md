@@ -153,7 +153,7 @@ Changes:
 - [migrate] migrated N strings
 - [refactor] renamed X keys across Y files
 
-Validation: ✓ passed
+Validation: ✓ passed / ✗ failed (see errors above)
 
 Notes:
 - <decisions only>
@@ -180,6 +180,8 @@ Batch by section. Ask scope. One batch at a time.
 | Pattern unclear | Ask before proceeding |
 | Validation fails | Fix, re-validate |
 | Refactor impact too high | Abort, suggest manual approach |
+| Create: user disagrees with library choice | Respect user's choice |
+| Refactor: 0 usages found | Abort — target doesn't exist |
 
 ## Resources
 

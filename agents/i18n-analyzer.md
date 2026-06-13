@@ -53,7 +53,7 @@ Analyze the i18n setup in this project. Report findings with confidence levels a
 ```
 ## i18n Analysis Report
 
-**Recommended Mode**: [setup|migrate]
+**Recommended Mode**: [create|migrate|refactor]
 **Reason**: [why this mode]
 
 **Library**: [name] (confidence: High/Medium/Low)
