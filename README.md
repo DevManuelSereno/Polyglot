@@ -1,195 +1,162 @@
-# i18n-migrator
+# Polyglot
 
-> Surgical i18n migration with minimal diffs for production codebases.
+> Internationalize your app. Create i18n from scratch or migrate hardcoded strings.
 
-A Claude Code / opencode skill that turns hardcoded strings into i18n translation calls — and nothing else.
+A Claude Code / opencode skill that handles the full i18n lifecycle — from initial setup to surgical string migration.
 
 ## Why Use This?
 
-When you need to migrate hardcoded strings to i18n in an existing codebase, you want:
+When you need to internationalize your app, you face two scenarios:
 
-- **Minimal diffs** — only the strings change, nothing else
-- **Consistency** — follow existing patterns, don't invent new ones
-- **Safety** — validate translation files automatically
-- **Speed** — auto-detect your stack, no manual configuration
+1. **No i18n yet** — You need to set it up from scratch
+2. **i18n exists** — You need to migrate hardcoded strings
 
-This skill does exactly that. It's not a tutorial, not a setup guide, not a refactoring tool. It's a surgical instrument for i18n migration.
+Polyglot handles both. It detects your project's state and routes to the appropriate workflow.
+
+## Features
+
+- **Auto-detects** whether you need setup or migration
+- **Setup mode** — creates i18n from scratch with best practices
+- **Migrate mode** — surgical string migration with minimal diffs
+- **8+ libraries** — next-intl, react-i18next, vue-i18n, react-intl, i18next, angular, svelte, lingui
+- **Auto-validation** — hooks validate translation files automatically
+- **Confidence-based detection** — reports certainty levels for every detection
 
 ## Installation
 
-### Claude Code
-
 ```bash
 # Clone the repo
-git clone https://github.com/DevManuelSereno/i18n-migrator.git
+git clone https://github.com/DevManuelSereno/polyglot.git
 
-# Install as personal skill (available in all projects)
-cp -r i18n-migrator ~/.claude/skills/i18n-migrator
+# Claude Code (personal)
+cp -r polyglot ~/.claude/skills/polyglot
 
-# Or install in a specific project
-cp -r i18n-migrator /path/to/project/.claude/skills/i18n-migrator
+# Claude Code (project)
+cp -r polyglot /path/to/project/.claude/skills/polyglot
+
+# opencode
+cp -r polyglot /path/to/project/.opencode/skills/polyglot
 ```
-
-### opencode
-
-```bash
-cp -r i18n-migrator /path/to/project/.opencode/skills/i18n-migrator
-```
-
-### Requirements
-
-- Node.js 18+ (for validation script)
-- Claude Code 2.1.145+ or opencode with skill support
 
 ## Usage
 
-### Basic Migration
+### Auto-Detect Mode
+
+Let Polyglot decide whether to setup or migrate:
 
 ```bash
-# In your Claude Code session
-/i18n-migrator src/components/Settings.tsx src/components/Profile.tsx
+/polyglot
 ```
 
-The first argument is the **target** (file to migrate), the second is the **reference** (already-migrated file to follow as pattern).
+### Explicit Mode
 
-### Auto-Detect
-
-If you don't provide a reference file, the skill will detect patterns from your project:
+Force a specific mode:
 
 ```bash
-Add i18n to src/components/Settings.tsx
+# Setup i18n from scratch
+/polyglot setup
+
+# Migrate strings in a specific file
+/polyglot migrate src/components/Settings.tsx
+
+# Migrate with reference file
+/polyglot migrate src/components/Settings.tsx src/components/Profile.tsx
 ```
 
-### Deep Analysis
+### Auto-Invoke
 
-If the skill can't detect your i18n setup automatically, invoke the analyzer:
+Claude will invoke Polyglot automatically when you ask:
 
-```bash
-/i18n-analyzer
 ```
-
-This runs in an isolated agent and reports your full i18n configuration with confidence levels.
-
-## What It Does
-
-### Supported Libraries
-
-| Library | Status |
-|---------|--------|
-| next-intl | ✓ |
-| react-i18next | ✓ |
-| i18next | ✓ |
-| react-intl / FormatJS | ✓ |
-| vue-i18n | ✓ |
-| @angular/localize | ✓ |
-| svelte-i18n | ✓ |
-| lingui | ✓ |
-
-### Supported Patterns
-
-- **Simple strings** — labels, buttons, titles, placeholders
-- **Interpolation** — `"Hello, {name}"` → `t('greeting', { name })`
-- **Pluralization** — `count === 1 ? '1 item' : 'N items'` → `t('items', { count })`
-- **Formatting** — dates, numbers, currencies via library utilities
-- **Rich text** — `<Trans>Click <b>here</b></Trans>`
-- **JSX contexts** — children, attributes, aria-labels, conditionals
-
-### What It Does NOT Do
-
-- Set up i18n from scratch
-- Refactor existing i18n code
-- Improve translations or wording
-- Change component architecture
-- Modify files outside scope
+Add i18n to my app
+Setup internationalization
+Migrate strings in src/components/Settings.tsx
+```
 
 ## Workflow
 
-The skill follows a 7-phase workflow:
+### Phase 1: Discover
 
-1. **Discover** — detect stack with confidence levels (High/Medium/Low)
-2. **Analyze** — read reference + target + translation files
-3. **Identify** — find hardcoded strings
-4. **Migrate** — apply patterns (interpolation, pluralization, etc.)
-5. **Update** — modify translation files or output keys
-6. **Validate** — auto-run validation via hook
-7. **Respond** — structured summary
+Detect your project's i18n state with confidence levels.
 
-### Confidence Levels
+### Phase 2: Route
 
-Every detection reports confidence:
+- **Has i18n?** → Migrate mode
+- **No i18n?** → Setup mode
 
-- **High** — found imports + config + multiple examples
-- **Medium** — found one signal or inferred from code
-- **Low** — guessed from patterns, needs confirmation
+### Phase 3A: Setup (if no i18n)
 
-If any detection is Low confidence, the skill asks before proceeding.
+1. Recommend library based on framework
+2. Install dependencies
+3. Create config files
+4. Create translation file structure
+5. Add provider to app root
+6. Create example translations
 
-## Example
+### Phase 3B: Migrate (if i18n exists)
 
-### Before
+1. Read reference + target + translation files
+2. Identify hardcoded strings
+3. Apply patterns (interpolation, pluralization, etc.)
+4. Update translation files
+5. Validate
 
-```tsx
-// src/components/Settings.tsx
-export default function SettingsPage() {
-  return (
-    <div>
-      <h1>Settings</h1>
-      <p>Configure your preferences</p>
-      <button>Save</button>
-    </div>
-  );
-}
-```
+### Phase 4: Validate
 
-### Command
+Auto-run validation via hook. Fix any errors.
 
-```bash
-/i18n-migrator src/components/Settings.tsx src/components/Profile.tsx
-```
+### Phase 5: Respond
 
-### After
+Structured summary of changes.
 
-```tsx
-// src/components/Settings.tsx
-import { useTranslations } from 'next-intl';
+## What It Handles
 
-export default function SettingsPage() {
-  const t = useTranslations('settings');
-  return (
-    <div>
-      <h1>{t('header.title')}</h1>
-      <p>{t('header.subtitle')}</p>
-      <button>{t('actions.save')}</button>
-    </div>
-  );
-}
-```
+### Setup Mode
 
-### Output
+- Library recommendation based on framework
+- Dependency installation
+- Config file creation
+- Translation file structure
+- Provider/wrapper setup
+- Example components
 
-```
-Files changed:
-- src/components/Settings.tsx
+### Migrate Mode
 
-Changes:
-- migrated 3 strings to t() calls
-- added: [settings.header.title, settings.header.subtitle, settings.actions.save]
-- namespace: settings
+- Simple strings (labels, buttons, titles)
+- String interpolation (`"Hello, {name}"`)
+- Pluralization (`"1 item"` / `"5 items"`)
+- Date/number/currency formatting
+- Rich text and inline components
+- JSX contexts (children, attributes, aria-labels)
+- Large modules (20+ strings — proposes batching)
 
-New keys to add:
-  settings.header.title: "Settings" (en)
-  settings.header.subtitle: "Configure your preferences" (en)
-  settings.actions.save: "Save" (en)
+## What It Does NOT Do
 
-Validation: ✓ passed
-```
+- Translate your content (use a translation service)
+- Manage translation workflows (use Lokalise, Crowdin, etc.)
+- Refactor existing i18n code (only migrates hardcoded strings)
+- Change component architecture (minimal diffs only)
+
+## Supported Libraries
+
+| Library | Framework | Status |
+|---------|-----------|--------|
+| next-intl | Next.js (App Router) | ✓ |
+| react-i18next | React | ✓ |
+| i18next | Universal | ✓ |
+| react-intl / FormatJS | React | ✓ |
+| vue-i18n | Vue | ✓ |
+| @angular/localize | Angular | ✓ |
+| svelte-i18n | Svelte | ✓ |
+| lingui | React/Universal | ✓ |
 
 ## Project Structure
 
 ```
-i18n-migrator/
-├── SKILL.md              # Core instructions (134 lines)
+polyglot/
+├── SKILL.md              # Core instructions with routing logic
 ├── discovery.md          # Stack detection with confidence levels
+├── setup.md              # Scaffolding guide for each library
 ├── patterns.md           # Interpolation, pluralization, formatting
 ├── examples.md           # Quick reference patterns
 ├── agents/
@@ -207,8 +174,18 @@ i18n-migrator/
 | Detection fails | Auto-invoke `/i18n-analyzer` |
 | Pattern unclear | Ask before proceeding |
 | Validation fails | Fix errors, re-validate |
-| Reference not provided | Detect from project files |
-| Translation files missing | Ask user for storage method |
+| Reference missing | Detect from project files |
+| No i18n + user wants migrate | Suggest setup first |
+
+## Confidence Levels
+
+Every detection reports confidence:
+
+- **High** — found imports + config + multiple examples
+- **Medium** — found one signal or inferred from code
+- **Low** — guessed from patterns, needs confirmation
+
+If any detection is Low confidence, the skill asks before proceeding.
 
 ## Troubleshooting
 

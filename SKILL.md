@@ -1,24 +1,24 @@
 ---
-name: i18n-migrator
+name: polyglot
 description: >
-  Migrates hardcoded UI strings into i18n translation calls (t(), useTranslations,
-  $t, formatMessage) with minimal, surgical diffs. Use when the user asks to add
-  i18n, internationalize, localize, or migrate/extract hardcoded strings or text in
-  a component or file — across next-intl, react-i18next, vue-i18n, react-intl,
-  i18next, angular, svelte, or lingui. Does NOT set up i18n from scratch or refactor
-  existing i18n code.
+  Internationalize your app. Creates i18n from scratch OR migrates hardcoded strings
+  to translation calls. Use when setting up i18n for the first time, or when migrating
+  existing strings across next-intl, react-i18next, vue-i18n, react-intl, i18next,
+  angular, svelte, or lingui.
 when_to_use: >
-  "add i18n", "migrate strings", "hardcoded text", "translate", "localize",
-  "i18n this component", "add translation keys"
-argument-hint: "[target] [reference]"
+  "add i18n", "setup i18n", "internationalize", "localize", "migrate strings",
+  "hardcoded text", "translate", "i18n this component", "add translation keys",
+  "create i18n", "configure i18n"
+argument-hint: "[mode] [target]"
 arguments:
+  - mode
   - target
-  - reference
 allowed-tools:
   - Read
   - Grep
   - Glob
   - Edit
+  - Write
   - Bash(node *)
 paths:
   - "**/*.{tsx,jsx,vue,svelte,ts,js}"
@@ -33,9 +33,12 @@ hooks:
           command: "node ${CLAUDE_SKILL_DIR}/scripts/validate-keys.js"
 ---
 
-# i18n Migrator
+# Polyglot
 
-Surgical i18n migration. Make the minimum correct change. Consistency > optimization.
+Internationalize your app. Two modes:
+
+- **Setup** — create i18n from scratch when your project has no i18n yet
+- **Migrate** — surgically migrate hardcoded strings when i18n already exists
 
 ## Project Context
 
@@ -51,13 +54,24 @@ find locales messages i18n -name "*.json" -o -name "*.yaml" 2>/dev/null | head -
 
 ## Arguments
 
-- **$target**: File(s) to migrate
-- **$reference**: Already-migrated file to follow as pattern
+- **$mode**: `setup` (create from scratch) or `migrate` (migrate existing strings). If omitted, auto-detect.
+- **$target**: File(s) to migrate (only for migrate mode)
 
-If not provided, ask the user.
+## Routing Logic
+
+1. Run discovery → see [discovery.md](discovery.md)
+2. If i18n detected → **Migrate mode**
+3. If no i18n detected → **Setup mode**
+4. If user explicitly passed mode → follow it
 
 ## Scope Rules
 
+### Setup Mode
+- Create i18n architecture (providers, config, translation files)
+- Follow framework conventions
+- Minimal scaffolding — no over-engineering
+
+### Migrate Mode
 - Do not modify files outside scope
 - Do not create new architecture
 - Do not refactor or modernize
@@ -72,19 +86,35 @@ Detect stack → see [discovery.md](discovery.md)
 
 If detection fails or confidence is Low, invoke `/i18n-analyzer` automatically.
 
-### Phase 2: Analyze
+### Phase 2: Route
+
+Based on detection:
+- **Has i18n?** → Go to Migrate workflow
+- **No i18n?** → Go to Setup workflow
+
+### Phase 3A: Setup (if no i18n exists)
+
+Follow [setup.md](setup.md):
+1. Recommend library based on framework
+2. Install dependencies
+3. Create config files
+4. Create translation file structure
+5. Add provider/wrapper to app root
+6. Create example translations
+
+### Phase 3B: Migrate (if i18n exists)
 
 Read reference (if provided) + target + translation files.
 
 Extract: hook pattern, key convention, existing keys, reusable keys.
 
-### Phase 3: Identify
+### Phase 4: Identify (Migrate only)
 
 Find hardcoded strings: labels, placeholders, errors, aria-labels, tooltips, buttons.
 
 Exclude: constants, logs, identifiers, CSS, data attributes.
 
-### Phase 4: Migrate
+### Phase 5: Apply Patterns (Migrate only)
 
 Follow [patterns.md](patterns.md):
 - Interpolation (never concatenate)
@@ -94,26 +124,29 @@ Follow [patterns.md](patterns.md):
 
 Make smallest change: replace strings, add hook/import if absent, preserve formatting.
 
-### Phase 5: Update Translations
+### Phase 6: Update Translations
 
 - **Local**: Update files directly
 - **Remote**: Output keys for user to add
 
-### Phase 6: Validate
+### Phase 7: Validate
 
 Validation runs automatically via hook. If it fails:
 1. Report errors to user
 2. Fix any missing keys in translation files
 3. Re-run validation before completing
 
-### Phase 7: Respond
+### Phase 8: Respond
 
 ```
+Mode: [setup|migrate]
+
 Files changed:
 - path/to/file.tsx
 
 Changes:
-- migrated N strings to t() calls
+- [setup] created i18n config with [library]
+- [migrate] migrated N strings to t() calls
 - reused: [key.one, key.two]
 - added: [key.three]
 - namespace: <ns>
@@ -128,7 +161,7 @@ Notes:
 - <decisions only>
 ```
 
-## Key Strategy
+## Key Strategy (Migrate mode)
 
 1. Check reference for equivalent keys
 2. Check target (may be partially migrated)
@@ -154,5 +187,6 @@ Propose batching by section. Ask for scope. Process one batch at a time.
 ## Resources
 
 - [discovery.md](discovery.md) — Stack detection with confidence levels
+- [setup.md](setup.md) — Scaffolding for each library
 - [patterns.md](patterns.md) — Interpolation, pluralization, formatting
 - [examples.md](examples.md) — Quick reference patterns

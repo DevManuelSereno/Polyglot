@@ -1,6 +1,6 @@
 # Discovery Protocol
 
-Detect the project's i18n stack automatically. Report confidence level for each detection.
+Detect the project's i18n stack and determine the appropriate mode.
 
 ## Detection Steps
 
@@ -19,7 +19,7 @@ Search for imports and config files:
 | svelte-i18n | `import { _ } from 'svelte-i18n'`, `$_()` in templates | High |
 | lingui | `import { t } from '@lingui/macro'`, `lingui.config.*` | High |
 
-**Fallback**: If no library detected, ask user which i18n system is in use.
+**Fallback**: If no library detected, ask user which i18n system to use (for Setup mode).
 
 ### 2. Detect Translation Storage
 
@@ -57,6 +57,17 @@ How translations are accessed in components:
 
 **Confidence**: High if reference module found, Medium if inferred from imports
 
+## Routing Decision
+
+After detection, determine the mode:
+
+| Condition | Mode | Action |
+|-----------|------|--------|
+| Library detected + translation files exist | **Migrate** | Follow migrate workflow |
+| Library detected + no translation files | **Migrate** (partial) | Ask about storage method |
+| No library detected + user wants i18n | **Setup** | Follow setup workflow |
+| No library detected + user wants migration | **Error** | Ask to setup i18n first |
+
 ## Error Handling
 
 If any detection step fails:
@@ -69,6 +80,7 @@ If any detection step fails:
 ```
 ## Detection Results
 
+**Mode**: [setup|migrate]
 **Library**: [name] (confidence: High/Medium/Low)
 **Storage**: [local/remote/hybrid] (confidence: High/Medium/Low)
 **Key convention**: [separator] + [structure] + [casing] (confidence: High/Medium/Low)

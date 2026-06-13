@@ -10,7 +10,7 @@ allowed-tools:
   - Bash(node *)
 ---
 
-Analyze the i18n setup in this project. Report findings with confidence levels.
+Analyze the i18n setup in this project. Report findings with confidence levels and recommend a mode.
 
 ## Analysis Steps
 
@@ -42,10 +42,18 @@ Analyze the i18n setup in this project. Report findings with confidence levels.
    - List 2-3 well-migrated components that follow the pattern
    - Prefer files with 5+ translation keys
 
+7. **Recommend mode**
+   - If i18n detected → recommend **Migrate** mode
+   - If no i18n → recommend **Setup** mode
+   - Report reasoning
+
 ## Output Format
 
 ```
 ## i18n Analysis Report
+
+**Recommended Mode**: [setup|migrate]
+**Reason**: [why this mode]
 
 **Library**: [name] (confidence: High/Medium/Low)
 **Storage**: [local/remote/hybrid] (confidence: High/Medium/Low)
