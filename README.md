@@ -56,6 +56,17 @@ cp -r Polyglot ~/.claude/skills/polyglot
 
 Works with Claude Code, opencode, and any Agent Skills-compatible tool. Optimized for Claude, GPT-4, Kimi, Qwen, Llama, and other major LLMs.
 
+### Installation Paths
+
+The skill works in both installation scenarios:
+
+| Installation | Path | Use Case |
+|-------------|------|----------|
+| **Global** | `~/.claude/skills/polyglot/` | Available in all your projects |
+| **Project** | `.claude/skills/polyglot/` | Specific to one project |
+
+The skill uses `${CLAUDE_SKILL_DIR}` internally, which automatically resolves to the correct path regardless of installation location. No configuration needed.
+
 ## Use
 
 ```bash

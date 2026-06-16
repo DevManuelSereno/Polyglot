@@ -23,6 +23,12 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Detect skill directory for resource loading
+// Priority: CLAUDE_SKILL_DIR env var → script's parent directory → current directory
+const skillDir = process.env.CLAUDE_SKILL_DIR || 
+                 path.join(__dirname, '..') || 
+                 process.cwd();
+
 // Parse CLI arguments
 const args = process.argv.slice(2);
 const options = {

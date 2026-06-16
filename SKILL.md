@@ -93,7 +93,7 @@ ls locales/*.json messages/*.json i18n/*.json 2>/dev/null | head -5 || echo "  N
 ### Phase 1: Discover
 
 1. **Fast Scan** — detect library, storage, locales
-2. **Convention Detection** — run `detect-conventions.js` → see [conventions.md](conventions.md)
+2. **Convention Detection** — run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js` → see [conventions.md](conventions.md)
 3. **Load User Overrides** — read `.claude/polyglot-conventions.md` if exists
 4. **Present to User** — show detected conventions, ask for validation
 5. **Apply** — use validated conventions in all subsequent phases

@@ -7,14 +7,17 @@ This file documents the i18n conventions detected in your project.
 Run the detection script to automatically analyze your codebase:
 
 ```bash
-node ~/.claude/skills/polyglot/scripts/detect-conventions.js
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js
 ```
 
-Or from the skill directory:
+Or from the skill directory (for manual execution):
 
 ```bash
+cd ~/.claude/skills/polyglot  # or .claude/skills/polyglot for project-level
 node scripts/detect-conventions.js
 ```
+
+**Note:** The `${CLAUDE_SKILL_DIR}` variable is automatically defined by Claude Code and works regardless of whether the skill is installed globally (`~/.claude/skills/`) or at the project level (`.claude/skills/`).
 
 ### Options
 
@@ -28,15 +31,30 @@ node scripts/detect-conventions.js
 ### Examples
 
 ```bash
-# Default: JSON compact, 10 files
-node scripts/detect-conventions.js
+# Default: JSON compact, 10 files (via Claude Code)
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js
 
 # Analyze 20 files with verbose output
-node scripts/detect-conventions.js --files 20 --verbose
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --files 20 --verbose
 
 # Save to file for manual review
-node scripts/detect-conventions.js --output .claude/.polyglot-conventions.json
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --output .claude/.polyglot-conventions.json
+
+# Manual execution (navigate to skill directory first)
+cd ~/.claude/skills/polyglot
+node scripts/detect-conventions.js --verbose
 ```
+
+### Installation Paths
+
+The skill works in both installation scenarios:
+
+| Installation | Path | Variable |
+|-------------|------|----------|
+| **Global** (all projects) | `~/.claude/skills/polyglot/` | `${CLAUDE_SKILL_DIR}` → `~/.claude/skills/polyglot` |
+| **Project** (single project) | `.claude/skills/polyglot/` | `${CLAUDE_SKILL_DIR}` → `.claude/skills/polyglot` |
+
+The `${CLAUDE_SKILL_DIR}` variable is automatically resolved by Claude Code, so you don't need to worry about which path to use.
 
 ---
 
@@ -132,6 +150,7 @@ Analyzes leaf keys in translation files to determine casing convention.
 ### "No files with i18n usage found"
 - Ensure your project has components that use i18n hooks
 - Check if the script is running from the project root
+- Try increasing the file count: `--files 20`
 
 ### "Only X files analyzed"
 - Increase the sample size: `--files 20`
@@ -144,6 +163,33 @@ Analyzes leaf keys in translation files to determine casing convention.
 ### Script takes too long
 - Reduce file count: `--files 5`
 - Exclude large directories from analysis
+
+### Path Issues
+If you see errors about missing files or incorrect paths:
+
+**Problem:** The script can't find `${CLAUDE_SKILL_DIR}`
+
+**Solution 1:** Run via Claude Code (automatic)
+```bash
+/polyglot migrate src/components/Settings.tsx
+```
+
+**Solution 2:** Navigate to skill directory manually
+```bash
+# For global installation
+cd ~/.claude/skills/polyglot
+node scripts/detect-conventions.js
+
+# For project installation
+cd .claude/skills/polyglot
+node scripts/detect-conventions.js
+```
+
+**Solution 3:** Set environment variable manually
+```bash
+export CLAUDE_SKILL_DIR=~/.claude/skills/polyglot
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js
+```
 
 ---
 
