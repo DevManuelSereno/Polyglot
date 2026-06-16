@@ -50,8 +50,8 @@ It auto-detects your project's state and routes to the right workflow. No manual
 ## Install
 
 ```bash
-git clone https://github.com/DevManuelSereno/Polyglot.git
-cp -r Polyglot ~/.claude/skills/polyglot
+git clone https://github.com/DevManuelSereno/polyglot.git
+cp -r polyglot ~/.claude/skills/polyglot
 ```
 
 Works with Claude Code, opencode, and any Agent Skills-compatible tool. Optimized for Claude, GPT-4, Kimi, Qwen, Llama, and other major LLMs.
@@ -276,24 +276,6 @@ No tool-specific dependencies. The validation script is plain Node.js.
 - Model-specific optimization notes
 - Fallback for `${CLAUDE_SKILL_DIR}` variable
 - Hook support documentation per LLM
-
-### v1.2.0 — Refactor Mode (June 2026)
-- **NEW**: Refactor mode for safe key/namespace renaming
-- 4-phase workflow: Impact Analysis → Preview → Apply → Validate
-- Risk levels (Low/Medium/High) with appropriate warnings
-- Orphaned reference detection in `validate-keys.js`
-
-### v1.1.0 — Create Mode (June 2026)
-- **NEW**: Create mode for setting up i18n from scratch
-- Library recommendation per framework
-- ESM + CommonJS examples for react-i18next and vue-i18n
-- Opinionated defaults with user override support
-
-### v1.0.0 — Initial Release (June 2026)
-- Migrate mode for surgical string migration
-- 8+ library support (next-intl, react-i18next, vue-i18n, etc.)
-- Auto-validation via Stop hook
-- Confidence-based detection
 
 ---
 
