@@ -92,7 +92,13 @@ ls locales/*.json messages/*.json i18n/*.json 2>/dev/null | head -5 || echo "  N
 
 ### Phase 1: Discover
 
-Detect stack → [discovery.md](discovery.md). Low confidence → invoke `/i18n-analyzer`.
+1. **Fast Scan** — detect library, storage, locales
+2. **Convention Detection** — run `detect-conventions.js` → see [conventions.md](conventions.md)
+3. **Load User Overrides** — read `.claude/polyglot-conventions.md` if exists
+4. **Present to User** — show detected conventions, ask for validation
+5. **Apply** — use validated conventions in all subsequent phases
+
+Low confidence → invoke `/i18n-analyzer`.
 
 ### Phase 2: Route
 
@@ -186,6 +192,7 @@ Batch by section. Ask scope. One batch at a time.
 ## Resources
 
 - [discovery.md](discovery.md) — Detection + routing
+- [conventions.md](conventions.md) — Auto-detection + manual override
 - [create.md](create.md) — Scaffolding per library
 - [refactor.md](refactor.md) — Safe refactoring with impact analysis
 - [patterns.md](patterns.md) — Interpolation, pluralization, Bom/Ruim

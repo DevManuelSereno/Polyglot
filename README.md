@@ -91,6 +91,13 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 - Renames keys/namespaces safely
 - Validates for orphaned references
 
+### Convention Detection (NEW)
+- Auto-detects namespace patterns, hook usage, sub-component patterns
+- Detects schema integration (Zod factory functions)
+- Detects storage type (local vs remote)
+- ALWAYS asks for user validation before applying
+- Supports manual overrides via `.claude/polyglot-conventions.md`
+
 ## What it does NOT do
 
 - Translate your content (use Lokalise, Crowdin, DeepL)
@@ -115,10 +122,12 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 ## How it works
 
 1. **Discover** — detects your i18n stack with confidence levels (High/Medium/Low)
-2. **Route** — no i18n? → Create. Migrate strings? → Migrate. Rename keys? → Refactor.
-3. **Execute** — follows the appropriate workflow (create/migrate/refactor)
-4. **Validate** — auto-runs validation at end of turn (checks missing keys, orphaned references, variable consistency)
-5. **Respond** — structured summary with files changed, keys added/renamed, validation status
+2. **Detect Conventions** — analyzes 10 files to extract namespace patterns, hook usage, sub-component patterns, schema integration
+3. **Validate** — presents detected conventions to user, asks for confirmation
+4. **Route** — no i18n? → Create. Migrate strings? → Migrate. Rename keys? → Refactor.
+5. **Execute** — follows the appropriate workflow (create/migrate/refactor)
+6. **Validate** — auto-runs validation at end of turn (checks missing keys, orphaned references, variable consistency)
+7. **Respond** — structured summary with files changed, keys added/renamed, validation status
 
 ## Before/after examples
 
@@ -129,15 +138,17 @@ See [examples.md](examples.md) for concrete patterns across all libraries.
 ```
 polyglot/
 ├── SKILL.md              # Core routing + workflow (193 lines)
-├── discovery.md          # Stack detection with confidence levels
+── discovery.md          # 3-level detection (fast scan → conventions → overrides)
+├── conventions.md        # Auto-detection + manual override documentation
 ├── create.md             # Opinionated scaffolding per library
 ├── refactor.md           # Safe refactoring with impact analysis
-├── patterns.md           # Interpolation, pluralization, formatting + Bom/Ruim
+├── patterns.md           # Interpolation, pluralization, sub-components, Zod schemas
 ├── examples.md           # Before/after for every library
 ├── agents/
-│   └── i18n-analyzer.md  # Deep analysis subagent
+│   ── i18n-analyzer.md  # Deep analysis subagent
 ├── scripts/
-│   └── validate-keys.js  # Auto-validates translation files
+│   ├── validate-keys.js  # Auto-validates translation files
+│   └── detect-conventions.js  # Auto-detects project conventions
 ├── README.md
 └── LICENSE
 ```
@@ -213,6 +224,7 @@ This skill is designed to work effectively across different LLM architectures:
 3. **Confidence reporting** — Prevents hallucination on any model
 4. **Validation script** — Deterministic checks don't depend on LLM quality
 5. **Examples** — Concrete before/after patterns work universally
+6. **Convention detection** — Adapts to project-specific patterns automatically
 
 ## Supported Agents & Tools
 

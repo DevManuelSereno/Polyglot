@@ -2,7 +2,39 @@
 
 Detect the project's i18n stack and determine the appropriate mode.
 
-## Detection Steps
+## Detection Levels
+
+### Level 1: Fast Scan (~1s)
+
+Quick detection of basic stack information:
+
+1. **Detect i18n Library** — search for imports and config files
+2. **Detect Translation Storage** — local files vs remote config
+3. **Detect Locales** — from config or file names
+
+**Output**: Library, storage type, available locales
+
+### Level 2: Convention Detection (~3s)
+
+Deep analysis of existing patterns using `detect-conventions.js`:
+
+1. **Namespace Pattern** — separator, depth, casing
+2. **Hook Usage** — direct vs prop drilling
+3. **Sub-Component Pattern** — how children access translations
+4. **Schema Integration** — Zod/Yup factory functions
+5. **Key Naming** — camelCase, snake_case, etc.
+
+**Output**: JSON compact or markdown verbose
+
+### Level 3: User Overrides
+
+Load manual conventions from `.claude/polyglot-conventions.md` if exists.
+
+**Priority**: User overrides > Detected conventions > Defaults
+
+---
+
+## Level 1: Fast Scan
 
 ### 1. Detect i18n Library
 
@@ -31,31 +63,91 @@ Search for translation files:
 
 **Confidence**: High if files found, Low if only config found, None if nothing found
 
-### 3. Detect Key Convention
-
-From translation files or reference module:
-
-- **Separator**: dot (`.`), colon (`:`), slash (`/`), underscore (`_`)
-- **Structure**: flat (`page_title`), nested (`page.title`), namespaced (`page:title`)
-- **Casing**: camelCase, snake_case, kebab-case
-
-**Confidence**: High if 3+ keys analyzed, Medium if 1-2 keys, Low if inferred from code only
-
-### 4. Detect Locales
+### 3. Detect Locales
 
 From config files or translation file names: `en`, `en-US`, `pt-BR`, etc.
 
 **Confidence**: High if config found, Medium if file names only
 
-### 5. Detect Hook/Function Pattern
+---
 
-How translations are accessed in components:
-- `const t = useTranslations()` (next-intl)
-- `const { t } = useTranslation()` (react-i18next)
-- `$t()` in templates (vue-i18n)
-- `intl.formatMessage()` (react-intl)
+## Level 2: Convention Detection
 
-**Confidence**: High if reference module found, Medium if inferred from imports
+Run `detect-conventions.js` to analyze 10 files (default) with existing i18n usage.
+
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js
+```
+
+### What Gets Detected
+
+1. **Namespace Pattern**
+   - Separator: dot (`.`), colon (`:`), slash (`/`), underscore (`_`)
+   - Depth: 1 (flat), 2 (namespace.key), 3+ (Module.Component.key)
+   - Casing: camelCase, PascalCase, snake_case, kebab-case
+
+2. **Hook Usage**
+   - Direct: Components call `useTranslations()` directly
+   - Prop drilling: Components receive `t` as prop
+
+3. **Sub-Component Pattern**
+   - How child components access translations
+   - Critical for avoiding runtime errors
+
+4. **Schema Integration**
+   - Zod/Yup factory functions: `createSchema(t)`
+   - Inline usage: schema calls `t()` directly
+
+5. **Key Naming**
+   - Casing convention for leaf keys
+   - Ensures consistency across new keys
+
+### Output Format
+
+**JSON (default):**
+```json
+{
+  "namespace": { "pattern": "Module.Component.key", "confidence": "high" },
+  "hookUsage": { "primary": "direct", "subComponents": "prop-drilling" },
+  "storage": { "type": "remote", "provider": "gcs" },
+  "schemas": { "detected": true, "pattern": "factory-function" }
+}
+```
+
+**Markdown (with --verbose):**
+```markdown
+## Namespace Pattern
+- Pattern: Module.Component.key
+- Confidence: High
+- Examples: OrganizationFlow.NewOrgChoice, OrganizationFlow.ReviewStep
+```
+
+### Confidence Levels
+
+| Level | Criteria | Action |
+|-------|----------|--------|
+| **High** | 80%+ files match | Safe to use |
+| **Medium** | 60-79% match | Review with user |
+| **Low** | <60% or <5 samples | Ask user for clarification |
+
+**Important**: ALWAYS present detected conventions to user for validation, regardless of confidence level.
+
+---
+
+## Level 3: User Overrides
+
+Check for `.claude/polyglot-conventions.md` in project root.
+
+If exists:
+- Read manual conventions
+- Merge with detected conventions
+- User overrides take priority
+
+If not exists:
+- Use detected conventions
+- Offer to create override file for future use
+
+---
 
 ## Routing Decision
 
@@ -68,12 +160,16 @@ After detection, determine the mode:
 | i18n detected + user wants rename/refactor keys | **Refactor** | Follow refactor workflow |
 | i18n detected + mode unclear | **Ask** | Clarify user intent |
 
+---
+
 ## Error Handling
 
 If any detection step fails:
 1. Report what was detected with confidence levels
 2. Ask user for missing information
-3. Do not proceed with Low confidence detections
+3. Do not proceed with Low confidence detections without user approval
+
+---
 
 ## Output Format
 
@@ -83,7 +179,15 @@ If any detection step fails:
 **Mode**: [create|migrate|refactor]
 **Library**: [name] (confidence: High/Medium/Low)
 **Storage**: [local/remote/hybrid] (confidence: High/Medium/Low)
-**Key convention**: [separator] + [structure] + [casing] (confidence: High/Medium/Low)
-**Locales**: [list] (confidence: High/Medium/Low)
-**Hook pattern**: [pattern] (confidence: High/Medium/Low)
+
+**Detected Conventions**:
+- Namespace: [pattern] (confidence: High/Medium/Low)
+- Hook Usage: [pattern] (confidence: High/Medium/Low)
+- Sub-Components: [pattern] (confidence: High/Medium/Low)
+- Schemas: [detected/not detected] (confidence: High/Medium/Low)
+- Key Naming: [casing] (confidence: High/Medium/Low)
+
+**User Overrides**: [loaded from file / none]
+
+**Validation Required**: Do these conventions match your project? [Y/n/edit]
 ```
