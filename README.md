@@ -1,4 +1,4 @@
-# Polyglot
+# polyglot
 
 > One skill for the entire i18n journey — from zero to fully localized.
 
