@@ -44,6 +44,7 @@ Polyglot is a Claude Code / opencode skill that handles the full i18n lifecycle:
 - **No i18n yet?** → Creates it from scratch (library, config, provider, translation files)
 - **i18n exists?** → Surgically migrates hardcoded strings with minimal diffs
 - **Need to rename keys?** → Safely refactors with impact analysis and validation
+- **Need translations?** → Generates translations for all locales from a source file
 
 It auto-detects your project's state and routes to the right workflow. No manual configuration needed.
 
@@ -77,9 +78,10 @@ The skill uses `${CLAUDE_SKILL_DIR}` internally, which automatically resolves to
 /polyglot create
 /polyglot migrate src/Settings.tsx src/Profile.tsx
 /polyglot refactor bloqueio block
+/polyglot translate --source pt --targets en,es,fr
 ```
 
-Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx"*, or *"Rename bloqueio namespace to block"*
+Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx"*, *"Rename bloqueio namespace to block"*, or *"Translate my locale files to English and Spanish"*
 
 ## What it does
 
@@ -102,7 +104,15 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 - Renames keys/namespaces safely
 - Validates for orphaned references
 
-### Convention Detection (NEW)
+### Translate mode (generate translations)
+- Translates locale files from source to multiple target languages
+- Supports 3 backends: Google (free), DeepL (API key), ChatGPT (API key)
+- Preserves `{interpolation}` variables automatically
+- Batch translation for performance
+- Draft marking for review workflows
+- Auto-validates with `validate-keys.js`
+
+### Convention Detection
 - Auto-detects namespace patterns, hook usage, sub-component patterns
 - Detects schema integration (Zod factory functions)
 - Detects storage type (local vs remote)
@@ -111,10 +121,9 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 
 ## What it does NOT do
 
-- Translate your content (use Lokalise, Crowdin, DeepL)
 - Change component architecture or business logic
 - Modify files outside the requested scope
-- Set up translation management workflows
+- Set up translation management workflows (TMS)
 - Refactor non-i18n code (only renames i18n keys/namespaces)
 
 ## Supported libraries
@@ -135,10 +144,10 @@ Or just ask naturally: *"Add i18n to my app"*, *"Migrate strings in Settings.tsx
 1. **Discover** — detects your i18n stack with confidence levels (High/Medium/Low)
 2. **Detect Conventions** — analyzes 10 files to extract namespace patterns, hook usage, sub-component patterns, schema integration
 3. **Validate** — presents detected conventions to user, asks for confirmation
-4. **Route** — no i18n? → Create. Migrate strings? → Migrate. Rename keys? → Refactor.
-5. **Execute** — follows the appropriate workflow (create/migrate/refactor)
+4. **Route** — no i18n? → Create. Migrate strings? → Migrate. Rename keys? → Refactor. Generate translations? → Translate.
+5. **Execute** — follows the appropriate workflow (create/migrate/refactor/translate)
 6. **Validate** — auto-runs validation at end of turn (checks missing keys, orphaned references, variable consistency)
-7. **Respond** — structured summary with files changed, keys added/renamed, validation status
+7. **Respond** — structured summary with files changed, keys added/renamed/translated, validation status
 
 ## Before/after examples
 
@@ -148,18 +157,21 @@ See [examples.md](examples.md) for concrete patterns across all libraries.
 
 ```
 polyglot/
-├── SKILL.md              # Core routing + workflow (193 lines)
-── discovery.md          # 3-level detection (fast scan → conventions → overrides)
+├── SKILL.md              # Core routing + workflow
+├── discovery.md          # 3-level detection (fast scan → conventions → overrides)
 ├── conventions.md        # Auto-detection + manual override documentation
 ├── create.md             # Opinionated scaffolding per library
 ├── refactor.md           # Safe refactoring with impact analysis
 ├── patterns.md           # Interpolation, pluralization, sub-components, Zod schemas
 ├── examples.md           # Before/after for every library
 ├── agents/
-│   ── i18n-analyzer.md  # Deep analysis subagent
+│   └── i18n-analyzer.md  # Deep analysis subagent
 ├── scripts/
 │   ├── validate-keys.js  # Auto-validates translation files
-│   └── detect-conventions.js  # Auto-detects project conventions
+│   ├── detect-conventions.js  # Auto-detects project conventions
+│   ├── translate.py      # Multi-backend translation tool
+│   ├── test_translate.py # Tests for translate.py
+│   └── requirements.txt  # Python dependencies
 ├── README.md
 └── LICENSE
 ```
@@ -174,6 +186,49 @@ polyglot/
 | Refactor impact too high | Warns user, suggests manual approach |
 | No i18n + user wants migrate | Suggests create first |
 | Translation files missing | Asks for storage method |
+| Translate: Python not installed | Guides user to install Python + dependencies |
+| Translate: API key missing | Asks for API key or suggests free backend |
+| Translate: variables lost | Auto-restores `{variables}` from source |
+
+## Translation Tool
+
+Polyglot includes a Python translation tool that generates translations for all locales from a source file. It supports multiple backends and preserves interpolation variables.
+
+### Setup
+
+```bash
+pip install -r ~/.claude/skills/polyglot/scripts/requirements.txt
+```
+
+### Usage
+
+```bash
+# Translate pt → en, es (Google, free, no API key needed)
+python ~/.claude/skills/polyglot/scripts/translate.py --source pt --targets en,es
+
+# Use DeepL (requires DEEPL_API_KEY)
+python ~/.claude/skills/polyglot/scripts/translate.py --source pt --targets en --backend deepl
+
+# Use ChatGPT for context-aware translations (requires OPENAI_API_KEY)
+python ~/.claude/skills/polyglot/scripts/translate.py --source pt --targets en --backend chatgpt
+
+# Mark as draft for review
+python ~/.claude/skills/polyglot/scripts/translate.py --source pt --targets en --draft
+
+# Dry run (preview without writing)
+python ~/.claude/skills/polyglot/scripts/translate.py --source pt --targets en --dry-run
+
+# Validate after translation
+python ~/.claude/skills/polyglot/scripts/translate.py --source pt --targets en --validate
+```
+
+### Backends
+
+| Backend | Quality | Cost | API Key |
+|---------|---------|------|---------|
+| `google` | Good | Free | Not required |
+| `deepl` | Excellent | Free tier (500k chars/mo) | `DEEPL_API_KEY` |
+| `chatgpt` | Best (context-aware) | Paid | `OPENAI_API_KEY` |
 
 ## Confidence levels
 
@@ -191,7 +246,7 @@ This skill is designed to work effectively across different LLM architectures:
 
 **Large Context Models** (Claude, GPT-4, Kimi):
 - Full progressive disclosure with multiple supporting files
-- Complex routing logic with 3 modes
+- Complex routing logic with 4 modes
 - Detailed impact analysis for refactor mode
 
 **Efficient Models** (Qwen, Llama, Mistral):
@@ -260,6 +315,17 @@ No tool-specific dependencies. The validation script is plain Node.js.
 **Large files (20+ strings)** — Proposes batching by section, asks for scope confirmation.
 
 ## Recent Updates
+
+### v1.5.0 — Translation Tool (June 2026)
+- **NEW**: Python translation tool (`scripts/translate.py`) for generating locale translations
+- Multi-backend support: Google (free), DeepL (API key), ChatGPT (API key)
+- Automatic `{variable}` preservation across translations
+- Batch translation for performance with large files
+- Draft marking for review workflows
+- Dry-run mode for previewing changes
+- Auto-validation integration with `validate-keys.js`
+- New `translate` mode in skill routing
+- Comprehensive test suite (`scripts/test_translate.py`)
 
 ### v1.4.0 — Convention Detection (June 2026)
 - **NEW**: Auto-detect project i18n conventions (`detect-conventions.js`)

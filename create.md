@@ -313,7 +313,11 @@ export default function Example() {
 After create, guide the user:
 
 1. **Migrate strings**: Run `/polyglot migrate src/components/Settings.tsx` to start migrating
-2. **Add locales**: Copy `en.json` to new locale files and translate
+2. **Generate translations**: Run the translation tool to create locale files:
+   ```bash
+   python ${CLAUDE_SKILL_DIR}/scripts/translate.py --source en --targets pt,es,fr --dir locales/
+   ```
+   This generates translated files for all target locales. Use `--draft` to mark for review.
 3. **Consider a Translation Management System (TMS)**: For 3+ locales, consider Lokalise, Crowdin, or Phrase
 
 ## Validation
