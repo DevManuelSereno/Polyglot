@@ -46,13 +46,7 @@ One skill for the entire i18n journey. Three modes:
 ## Project Context
 
 ```!
-echo "=== i18n Detection ==="
-echo "Library:"
-grep -rE "useTranslation|useTranslations|useIntl|\$t\(|formatMessage" \
-  --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
-  --include="*.vue" --include="*.svelte" -l 2>/dev/null | head -3 || echo "  Not found"
-echo "Files:"
-ls locales/*.json messages/*.json i18n/*.json 2>/dev/null | head -5 || echo "  Not found"
+node ${CLAUDE_SKILL_DIR}/scripts/detect-stack.js
 ```
 
 ## Arguments
