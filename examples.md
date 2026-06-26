@@ -58,9 +58,9 @@ const intl = useIntl();
 { "greeting": "Hello, {name}! Welcome back." }
 ```
 
-**Bom/Ruim:**
-- **Ruim**: `t('hello') + user.name + t('welcome')` — translator can't reorder
-- **Bom**: `t('greeting', { name })` — translator controls word order
+**Good/Bad:**
+- **Bad**: `t('hello') + user.name + t('welcome')` — translator can't reorder
+- **Good**: `t('greeting', { name })` — translator controls word order
 
 ### Pluralization
 ```tsx
@@ -77,9 +77,9 @@ const intl = useIntl();
 { "items": "{count, plural, one {# item} other {# items}}" }
 ```
 
-**Bom/Ruim:**
-- **Ruim**: `count === 1 ? t('one') : t('other')` — fails for languages with 3+ plural forms
-- **Bom**: `t('items', { count })` — library handles all locale rules
+**Good/Bad:**
+- **Bad**: `count === 1 ? t('one') : t('other')` — fails for languages with 3+ plural forms
+- **Good**: `t('items', { count })` — library handles all locale rules
 
 ### Attributes
 ```tsx
@@ -111,9 +111,9 @@ const intl = useIntl();
 { "helpLink": "Click <link>here</link> for help" }
 ```
 
-**Bom/Ruim:**
-- **Ruim**: `<p>{t('click')} <a>{t('here')}</a> {t('forHelp')}</p>` — sentence split into 3 keys
-- **Bom**: `t('helpLink', { link })` — translator sees full sentence
+**Good/Bad:**
+- **Bad**: `<p>{t('click')} <a>{t('here')}</a> {t('forHelp')}</p>` — sentence split into 3 keys
+- **Good**: `t('helpLink', { link })` — translator sees full sentence
 
 ### Date/Number Formatting
 ```tsx
@@ -126,18 +126,18 @@ const intl = useIntl();
 <p>{t('price', { amount: formatter.number(price, { style: 'currency', currency: 'USD' }) })}</p>
 ```
 
-**Bom/Ruim:**
-- **Ruim**: `toLocaleDateString('en-US')` — hardcoded locale
-- **Bom**: `formatter.dateTime(date)` — uses user's locale
+**Good/Bad:**
+- **Bad**: `toLocaleDateString('en-US')` — hardcoded locale
+- **Good**: `formatter.dateTime(date)` — uses user's locale
 
 ## Key Naming
 
-**Bom:**
+**Good:**
 - `profile.header.title` — clear hierarchy
 - `settings.form.emailLabel` — context + purpose
 - `billing.invoice.emptyState` — feature + entity + state
 
-**Ruim:**
+**Bad:**
 - `title` — too generic, collides everywhere
 - `headerText` — vague, what header?
 - `page.content.section.label.text` — over-nested, 5 levels deep

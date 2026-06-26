@@ -15,9 +15,9 @@ When a hardcoded string contains dynamic values, never concatenate — use the i
 - If interpolation is used in the reference module, replicate the same variable naming style.
 - Watch for implicit concatenation in JSX: `<p>Hello, {user.name}</p>` is interpolation, not two strings.
 
-**Bom/Ruim:**
-- **Ruim**: `t('hello') + ' ' + user.name + ' ' + t('welcome')` — translator can't reorder words
-- **Bom**: `t('greeting', { name: user.name })` — translator controls full sentence structure
+**Good/Bad:**
+- **Bad**: `t('hello') + ' ' + user.name + ' ' + t('welcome')` — translator can't reorder words
+- **Good**: `t('greeting', { name: user.name })` — translator controls full sentence structure
 
 ## Pluralization
 
@@ -33,9 +33,9 @@ When a string changes based on a count, use the pluralization mechanism detected
 - Always delegate plural logic to the i18n library.
 - If the reference module has pluralized keys, replicate the exact same pattern.
 
-**Bom/Ruim:**
-- **Ruim**: `count === 1 ? t('item.one') : t('item.other')` — fails for Arabic, Polish, Russian
-- **Bom**: `t('items', { count })` — library handles all locale-specific plural rules
+**Good/Bad:**
+- **Bad**: `count === 1 ? t('item.one') : t('item.other')` — fails for Arabic, Polish, Russian
+- **Good**: `t('items', { count })` — library handles all locale-specific plural rules
 
 ## Formatting (Dates, Numbers, Currencies)
 
@@ -51,9 +51,9 @@ When a hardcoded string contains formatted values, use the formatting mechanism 
 - Do not format dates/numbers inline with `toLocaleDateString()` if the project has a formatting utility.
 - Follow the existing formatting pattern from the reference module exactly.
 
-**Bom/Ruim:**
-- **Ruim**: `new Date().toLocaleDateString('en-US')` — hardcoded locale, ignores user preference
-- **Bom**: `formatter.dateTime(date)` — uses user's locale automatically
+**Good/Bad:**
+- **Bad**: `new Date().toLocaleDateString('en-US')` — hardcoded locale, ignores user preference
+- **Good**: `formatter.dateTime(date)` — uses user's locale automatically
 
 ## Rich Text and Inline Components
 
@@ -69,9 +69,9 @@ When a translated string contains markup, links, or inline components, use the m
 - If the reference module uses `<Trans>` or equivalent, replicate the exact pattern.
 - Do not split a rich text sentence into multiple keys.
 
-**Bom/Ruim:**
-- **Ruim**: `<p>{t('click')} <a>{t('here')}</a> {t('forHelp')}</p>` — sentence split, translator loses context
-- **Bom**: `t('helpLink', { link: (chunks) => <a>{chunks}</a> })` — translator sees full sentence
+**Good/Bad:**
+- **Bad**: `<p>{t('click')} <a>{t('here')}</a> {t('forHelp')}</p>` — sentence split, translator loses context
+- **Good**: `t('helpLink', { link: (chunks) => <a>{chunks}</a> })` — translator sees full sentence
 
 ## Sub-Component Translation Patterns
 
@@ -222,9 +222,9 @@ The `detect-conventions.js` script detects:
 - If schemas use inline `t()` → apply inline pattern
 - If no schemas detected → skip this section
 
-**Bom/Ruim:**
-- **Ruim**: Schema file imports `useTranslations` directly (breaks server components)
-- **Bom**: Schema receives `t` as parameter (works everywhere)
+**Good/Bad:**
+- **Bad**: Schema file imports `useTranslations` directly (breaks server components)
+- **Good**: Schema receives `t` as parameter (works everywhere)
 
 ## JSX Contexts
 

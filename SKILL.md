@@ -1,5 +1,6 @@
 ---
 name: polyglot
+version: 1.5.0
 description: >
   One skill for the entire i18n journey. Creates i18n from scratch, migrates
   hardcoded strings to translation calls, refactors existing i18n keys
@@ -49,7 +50,7 @@ One skill for the entire i18n journey. Four modes:
 ## Project Context
 
 ```!
-node ${CLAUDE_SKILL_DIR}/scripts/detect-stack.js
+node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick
 ```
 
 ## Arguments
@@ -96,11 +97,33 @@ node ${CLAUDE_SKILL_DIR}/scripts/detect-stack.js
 
 ### Phase 1: Discover
 
-1. **Fast Scan** — detect library, storage, locales
-2. **Convention Detection** — run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js` → see [conventions.md](conventions.md)
-3. **Load User Overrides** — read `.claude/polyglot-conventions.md` if exists
-4. **Present to User** — show detected conventions, ask for validation
-5. **Apply** — use validated conventions in all subsequent phases
+**Step 1: Check for conventions file**
+- Look for `.claude/polyglot-conventions.md` in project root
+- If exists AND contains `skip-discovery: true`:
+  - Load all conventions from file
+  - **Skip Steps 2-5 entirely**
+  - Go directly to Phase 2 (Route)
+- If not exists OR `skip-discovery: false`:
+  - Proceed to Step 2
+
+**Step 2: Fast Scan** (only if no skip)
+- Run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick`
+- Output: library, storage, locales (~200 tokens)
+
+**Step 3: Convention Detection** (only if no skip)
+- Run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js` (deep mode)
+- Analyze 10 files for patterns (~2k tokens)
+
+**Step 4: Load User Overrides** (only if no skip)
+- Read `.claude/polyglot-conventions.md` if exists
+- Merge with detected conventions (user overrides take priority)
+
+**Step 5: Present to User** (only if no skip)
+- Show detected conventions
+- Ask: "Do these conventions match your project? [Y/n/edit]"
+- If user confirms: proceed to Phase 2
+- If user edits: update conventions, proceed to Phase 2
+- Offer to save `.claude/polyglot-conventions.md` for future sessions
 
 Low confidence → invoke `/i18n-analyzer`.
 
@@ -150,7 +173,7 @@ Exclude: constants, logs, identifiers, CSS, data attributes.
 Follow [patterns.md](patterns.md): interpolation, pluralization, formatting, rich text.
 Smallest change only: replace strings, add hook/import if absent.
 
-### Phase 6: Update Translations
+### Phase 6: Update Translations (All modes except Create)
 
 - **Local**: Run `python ${CLAUDE_SKILL_DIR}/scripts/translate.py --source <locale> --targets <locales> --dir <dir> --validate`
   - Supports backends: `google` (free, default), `deepl` (API key), `chatgpt` (API key)
@@ -214,7 +237,12 @@ Batch by section. Ask scope. One batch at a time.
 
 Polyglot includes a Python translation tool (`scripts/translate.py`) that generates translations for all locales from a source file.
 
-### Setup
+See [scripts/translate.py](scripts/translate.py) for full documentation, or run:
+```bash
+uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --help
+```
+
+### Quick Start
 
 ```bash
 # Install uv if you don't have it (recommended)
@@ -226,34 +254,6 @@ uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en,es
 # Or with pip
 pip install -r ${CLAUDE_SKILL_DIR}/scripts/requirements.txt
 python ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en,es
-```
-
-### Usage
-
-```bash
-# With uv (recommended - auto-installs Python + dependencies)
-# Windows:
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.bat --source pt --targets en,es
-# Unix/macOS:
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.sh --source pt --targets en,es
-
-# Or directly:
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en,es
-
-# Use DeepL (requires API key)
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --backend deepl --api-key YOUR_KEY
-
-# Use ChatGPT for context-aware translations
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en,es --backend chatgpt --api-key YOUR_KEY
-
-# Mark as draft for review
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --draft
-
-# Dry run (preview only)
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --dry-run
-
-# Validate after translation
-uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --validate
 ```
 
 ### Backends
@@ -268,9 +268,10 @@ uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --valid
 
 - Preserves `{interpolation}` variables across translations
 - Batch translation for performance
-- Draft marking for review workflows
-- Auto-validates with `validate-keys.js`
+- Draft marking for review workflows (`--draft`)
+- Auto-validates with `validate-keys.js` (`--validate`)
 - Nested JSON structure preservation
+- Dry-run mode (`--dry-run`)
 
 ## Resources
 
@@ -278,7 +279,7 @@ uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --valid
 - [conventions.md](conventions.md) — Auto-detection + manual override
 - [create.md](create.md) — Scaffolding per library
 - [refactor.md](refactor.md) — Safe refactoring with impact analysis
-- [patterns.md](patterns.md) — Interpolation, pluralization, Bom/Ruim
+- [patterns.md](patterns.md) — Interpolation, pluralization, Good/Bad
 - [examples.md](examples.md) — Before/after for every library
 - [agents/i18n-analyzer.md](agents/i18n-analyzer.md) — Deep analysis subagent
 - [scripts/translate.py](scripts/translate.py) — Translation tool (multi-backend)

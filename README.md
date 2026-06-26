@@ -157,21 +157,29 @@ See [examples.md](examples.md) for concrete patterns across all libraries.
 
 ```
 polyglot/
-├── SKILL.md              # Core routing + workflow
-├── discovery.md          # 3-level detection (fast scan → conventions → overrides)
-├── conventions.md        # Auto-detection + manual override documentation
-├── create.md             # Opinionated scaffolding per library
-├── refactor.md           # Safe refactoring with impact analysis
-├── patterns.md           # Interpolation, pluralization, sub-components, Zod schemas
-├── examples.md           # Before/after for every library
+├── SKILL.md                 # Core routing + workflow
+├── discovery.md             # 3-level detection (fast scan → conventions → overrides)
+├── conventions.md           # Auto-detection + manual override documentation
+├── create.md                # Opinionated scaffolding per library
+├── refactor.md              # Safe refactoring with impact analysis
+├── patterns.md              # Interpolation, pluralization, sub-components, Zod schemas
+├── examples.md              # Before/after for every library
 ├── agents/
-│   └── i18n-analyzer.md  # Deep analysis subagent
+│   └── i18n-analyzer.md     # Deep analysis subagent
 ├── scripts/
-│   ├── validate-keys.js  # Auto-validates translation files
-│   ├── detect-conventions.js  # Auto-detects project conventions
-│   ├── translate.py      # Multi-backend translation tool
-│   ├── test_translate.py # Tests for translate.py
-│   └── requirements.txt  # Python dependencies
+│   ├── package.json         # Node dependencies (js-yaml)
+│   ├── validate-keys.js     # Auto-validates translation files
+│   ├── detect-conventions.js # Auto-detects project conventions
+│   ├── translate.py         # Multi-backend translation tool
+│   ├── test_translate.py    # Tests for translate.py
+│   ├── requirements.txt     # Python dependencies
+│   ├── translate.bat        # Windows wrapper
+│   └── translate.sh         # Unix wrapper
+├── examples/
+│   └── conventions/         # Example convention files
+│       ├── next-intl-gcs.md
+│       ├── react-i18next-local.md
+│       └── vue-i18n-crowdin.md
 ├── README.md
 └── LICENSE
 ```
@@ -267,7 +275,7 @@ This skill is designed to work effectively across different LLM architectures:
 - Detailed impact analysis for refactor mode
 
 **Efficient Models** (Qwen, Llama, Mistral):
-- Concise SKILL.md (193 lines) for minimal context usage
+- Concise SKILL.md (286 lines) for minimal context usage
 - Clear phase-based workflow for step-by-step execution
 - Structured output format for consistent responses
 

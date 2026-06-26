@@ -96,11 +96,11 @@ function extractI18nKeys(files) {
   // formatMessage({ id: 'key' }), formatMessage({id: "key"})
   // useTranslations('namespace'), useTranslation('namespace')
   const patterns = [
-    /(?<!\w)\bt\(['"`]([^'"`]+)['"`]\)/g,  // Negative lookbehind to avoid setTimeout, etc.
-    /\$t\(['"`]([^'"`]+)['"`]\)/g,
-    /i18n\.t\(['"`]([^'"`]+)['"`]\)/g,
+    /(?<![a-zA-Z0-9_])\bt\(\s*['"`]([^'"`]+)['"`]\s*\)/g,  // Negative lookbehind for word chars + underscore
+    /\$t\(\s*['"`]([^'"`]+)['"`]\s*\)/g,
+    /i18n\.t\(\s*['"`]([^'"`]+)['"`]\s*\)/g,
     /formatMessage\(\s*\{\s*id:\s*['"`]([^'"`]+)['"`]/g,
-    /useTranslations?\(['"`]([^'"`]+)['"`]\)/g,
+    /useTranslations?\(\s*['"`]([^'"`]+)['"`]\s*\)/g,
   ];
 
   for (const file of files) {

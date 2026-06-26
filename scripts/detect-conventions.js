@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * detect-conventions.js ÔÇö Auto-detect i18n conventions in a codebase
+ * detect-conventions.js — Auto-detect i18n conventions in a codebase
  *
  * Two modes:
- *   --quick  Fast stack detection (~200 tokens, ~100ms) ÔÇö for dynamic context
- *   --deep   Full convention analysis (~2k tokens, ~1s) ÔÇö for Phase 1, Step 2
+ *   --quick  Fast stack detection (~200 tokens, ~100ms) — for dynamic context
+ *   --deep   Full convention analysis (~2k tokens, ~1s) — for Phase 1, Step 2
  *
  * Quick mode detects:
  *   1. i18n library in use
@@ -65,7 +65,7 @@ for (let i = 0; i < args.length; i++) {
 
 if (options.help) {
   console.log(`
-detect-conventions.js ÔÇö Auto-detect i18n conventions
+detect-conventions.js — Auto-detect i18n conventions
 
 Usage:
   node detect-conventions.js [options]
@@ -214,7 +214,7 @@ function detectLocales(translationFiles) {
 }
 
 // ============================================================================
-// QUICK MODE ÔÇö Fast stack detection (~200 tokens)
+// QUICK MODE — Fast stack detection (~200 tokens)
 // ============================================================================
 
 function runQuickDetection() {
@@ -260,7 +260,7 @@ function runQuickDetection() {
 }
 
 // ============================================================================
-// DEEP MODE ÔÇö Full convention analysis (~2k tokens)
+// DEEP MODE — Full convention analysis (~2k tokens)
 // ============================================================================
 
 function detectNamespace(filesToAnalyze) {
@@ -341,8 +341,24 @@ function detectStorage() {
       hasSyncScripts = /upload|sync|push.*i18n|push.*locale/i.test(Object.values(pkg.scripts || {}).join(' '));
     } catch {}
   }
-  const type = remoteProvider ? 'remote' : localFiles.length > 0 ? 'local' : 'unknown';
-  return { type, provider: remoteProvider, localFiles: localFiles.length > 0, workflow: remoteProvider ? 'generate-json ÔåÆ user-uploads' : 'direct-file-edit', confidence: type !== 'unknown' ? 'high' : 'low' };
+  
+  // Determine storage type:
+  // - If remote provider detected in config → 'remote'
+  // - Else if local translation files exist → 'local'
+  // - Else if config files exist but no local files → 'remote' (likely TMS integration)
+  // - Else → 'unknown'
+  let type;
+  if (remoteProvider) {
+    type = 'remote';
+  } else if (localFiles.length > 0) {
+    type = 'local';
+  } else if (configFiles.length > 0) {
+    type = 'remote'; // Config without local files suggests TMS
+  } else {
+    type = 'unknown';
+  }
+  
+  return { type, provider: remoteProvider, localFiles: localFiles.length > 0, workflow: remoteProvider ? 'generate-json → user-uploads' : 'direct-file-edit', confidence: type !== 'unknown' ? 'high' : 'low' };
 }
 
 function detectSubComponents(filesToAnalyze) {
@@ -510,7 +526,7 @@ function main() {
       conventions,
       warnings: [],
     };
-    if (options.files < 10) result.warnings.push(`Only ${options.files} files analyzed ÔÇö increase sample for higher confidence`);
+    if (options.files < 10) result.warnings.push(`Only ${options.files} files analyzed — increase sample for higher confidence`);
   }
 
   let output;

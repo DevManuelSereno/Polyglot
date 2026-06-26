@@ -175,15 +175,15 @@ Safe refactoring of i18n keys and namespaces with mandatory impact analysis.
 | Validation finds orphaned references | Report to user, offer to fix |
 | Translation files invalid after rename | Fix keys, re-validate |
 
-## Bom/Ruim
+## Good/Bad
 
-**Bom:**
+**Good:**
 - Run impact analysis before any change
 - Show preview diff before applying
 - Require explicit confirmation at each phase
 - Validate after applying changes
 
-**Ruim:**
+**Bad:**
 - Rename keys without checking usages
 - Apply changes without showing diff
 - Assume all usages are in the same module
