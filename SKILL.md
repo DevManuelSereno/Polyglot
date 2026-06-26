@@ -41,15 +41,15 @@ hooks:
 
 One skill for the entire i18n journey. Four modes:
 
-- **Create** ÔÇö create i18n from scratch when your project has none
-- **Migrate** ÔÇö surgically migrate hardcoded strings when i18n exists
-- **Refactor** ÔÇö rename keys/namespaces safely with impact analysis
-- **Translate** ÔÇö generate translations for all locales from a source file
+- **Create** — create i18n from scratch when your project has none
+- **Migrate** — surgically migrate hardcoded strings when i18n exists
+- **Refactor** — rename keys/namespaces safely with impact analysis
+- **Translate** — generate translations for all locales from a source file
 
 ## Project Context
 
 ```!
-node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick
+node ${CLAUDE_SKILL_DIR}/scripts/detect-stack.js
 ```
 
 ## Arguments
@@ -59,19 +59,19 @@ node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick
 
 ## Routing
 
-1. Run discovery ÔåÆ [discovery.md](discovery.md)
-2. No i18n ÔåÆ **Create**
-3. i18n exists + user wants migrate ÔåÆ **Migrate**
-4. i18n exists + user wants rename/refactor ÔåÆ **Refactor**
-5. i18n exists + user wants translations ÔåÆ **Translate**
-6. User passed explicit mode ÔåÆ follow it
+1. Run discovery → [discovery.md](discovery.md)
+2. No i18n → **Create**
+3. i18n exists + user wants migrate → **Migrate**
+4. i18n exists + user wants rename/refactor → **Refactor**
+5. i18n exists + user wants translations → **Translate**
+6. User passed explicit mode → follow it
 
 ## Scope Rules
 
 ### Create
 - Create i18n architecture (providers, config, translation files)
 - Follow framework conventions
-- Minimal scaffolding ÔÇö no over-engineering
+- Minimal scaffolding — no over-engineering
 
 ### Migrate
 - Do not modify files outside scope
@@ -82,8 +82,8 @@ node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick
 
 ### Refactor
 - **Impact analysis is mandatory** before any change
-- **Explicit confirmation** required at each phase (analyze ÔåÆ preview ÔåÆ apply ÔåÆ validate)
-- Only rename keys/namespaces ÔÇö do not change component logic
+- **Explicit confirmation** required at each phase (analyze → preview → apply → validate)
+- Only rename keys/namespaces — do not change component logic
 - Report all cross-module dependencies
 
 ### Translate
@@ -96,42 +96,20 @@ node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick
 
 ### Phase 1: Discover
 
-**Step 1: Check for conventions file**
-- Look for `.claude/polyglot-conventions.md` in project root
-- If exists AND contains `skip-discovery: true`:
-  - Load all conventions from file
-  - **Skip Steps 2-5 entirely**
-  - Go directly to Phase 2 (Route)
-- If not exists OR `skip-discovery: false`:
-  - Proceed to Step 2
-
-**Step 2: Fast Scan** (only if no skip)
-- Run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js --quick`
-- Output: library, storage, locales (~200 tokens)
-
-**Step 3: Convention Detection** (only if no skip)
-- Run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js` (deep mode)
-- Analyze 10 files for patterns (~2k tokens)
-
-**Step 4: Load User Overrides** (only if no skip)
-- Read `.claude/polyglot-conventions.md` if exists
-- Merge with detected conventions (user overrides take priority)
-
-**Step 5: Present to User** (only if no skip)
-- Show detected conventions
-- Ask: "Do these conventions match your project? [Y/n/edit]"
-- If user confirms: proceed to Phase 2
-- If user edits: update conventions, proceed to Phase 2
-- Offer to save `.claude/polyglot-conventions.md` for future sessions
+1. **Fast Scan** — detect library, storage, locales
+2. **Convention Detection** — run `node ${CLAUDE_SKILL_DIR}/scripts/detect-conventions.js` → see [conventions.md](conventions.md)
+3. **Load User Overrides** — read `.claude/polyglot-conventions.md` if exists
+4. **Present to User** — show detected conventions, ask for validation
+5. **Apply** — use validated conventions in all subsequent phases
 
 Low confidence → invoke `/i18n-analyzer`.
 
 ### Phase 2: Route
 
-- **No i18n?** ÔåÆ Create
-- **Migrate strings?** ÔåÆ Migrate
-- **Rename keys/namespaces?** ÔåÆ Refactor
-- **Generate translations?** ÔåÆ Translate
+- **No i18n?** → Create
+- **Migrate strings?** → Migrate
+- **Rename keys/namespaces?** → Refactor
+- **Generate translations?** → Translate
 
 ### Phase 3A: Create
 
@@ -149,10 +127,10 @@ Read reference + target + translation files. Extract: hook pattern, key conventi
 ### Phase 3C: Refactor
 
 Follow [refactor.md](refactor.md):
-1. **Impact Analysis** ÔÇö find all usages, cross-module dependencies, blast radius
-2. **Preview** ÔÇö show exact diff, list all files to change
-3. **Apply** ÔÇö rename in all components + translation files
-4. **Validate** ÔÇö check for orphaned references, run validation
+1. **Impact Analysis** — find all usages, cross-module dependencies, blast radius
+2. **Preview** — show exact diff, list all files to change
+3. **Apply** — rename in all components + translation files
+4. **Validate** — check for orphaned references, run validation
 
 ### Phase 3D: Translate
 
@@ -183,7 +161,7 @@ Smallest change only: replace strings, add hook/import if absent.
 
 ### Phase 7: Validate
 
-Auto-runs via Stop hook. Fix errors ÔåÆ re-validate.
+Auto-runs via Stop hook. Fix errors → re-validate.
 
 ### Phase 8: Respond
 
@@ -199,7 +177,7 @@ Changes:
 - [refactor] renamed X keys across Y files
 - [translate] translated N keys to M locales using [backend]
 
-Validation: Ô£ô passed / Ô£ù failed (see errors above)
+Validation: ✓ passed / ✗ failed (see errors above)
 
 Notes:
 - <decisions only>
@@ -227,7 +205,7 @@ Batch by section. Ask scope. One batch at a time.
 | Validation fails | Fix, re-validate |
 | Refactor impact too high | Abort, suggest manual approach |
 | Create: user disagrees with library choice | Respect user's choice |
-| Refactor: 0 usages found | Abort ÔÇö target doesn't exist |
+| Refactor: 0 usages found | Abort — target doesn't exist |
 | Translate: Python not installed | Guide user to install Python + `pip install deep-translator` |
 | Translate: API key missing | Ask user for API key or suggest free backend |
 | Translate: variables lost | Auto-restore `{variables}` from source |
@@ -296,13 +274,13 @@ uv run ${CLAUDE_SKILL_DIR}/scripts/translate.py --source pt --targets en --valid
 
 ## Resources
 
-- [discovery.md](discovery.md) ÔÇö Detection + routing
-- [conventions.md](conventions.md) ÔÇö Auto-detection + manual override
-- [create.md](create.md) ÔÇö Scaffolding per library
-- [refactor.md](refactor.md) ÔÇö Safe refactoring with impact analysis
-- [patterns.md](patterns.md) ÔÇö Interpolation, pluralization, Bom/Ruim
-- [examples.md](examples.md) ÔÇö Before/after for every library
-- [agents/i18n-analyzer.md](agents/i18n-analyzer.md) ÔÇö Deep analysis subagent
-- [scripts/translate.py](scripts/translate.py) ÔÇö Translation tool (multi-backend)
-- [scripts/validate-keys.js](scripts/validate-keys.js) ÔÇö Key validation
-- [scripts/detect-conventions.js](scripts/detect-conventions.js) ÔÇö Convention detection
+- [discovery.md](discovery.md) — Detection + routing
+- [conventions.md](conventions.md) — Auto-detection + manual override
+- [create.md](create.md) — Scaffolding per library
+- [refactor.md](refactor.md) — Safe refactoring with impact analysis
+- [patterns.md](patterns.md) — Interpolation, pluralization, Bom/Ruim
+- [examples.md](examples.md) — Before/after for every library
+- [agents/i18n-analyzer.md](agents/i18n-analyzer.md) — Deep analysis subagent
+- [scripts/translate.py](scripts/translate.py) — Translation tool (multi-backend)
+- [scripts/validate-keys.js](scripts/validate-keys.js) — Key validation
+- [scripts/detect-conventions.js](scripts/detect-conventions.js) — Convention detection
