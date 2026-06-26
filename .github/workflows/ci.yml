@@ -1,0 +1,64 @@
+name: CI
+
+# Triggers: quando esse workflow roda?
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Jobs: o que vamos fazer?
+jobs:
+  validate:
+    name: Validate Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Clonar o repositório
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Step 2: Configurar Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      # Step 3: Validar sintaxe dos scripts Node
+      - name: Validate Node scripts syntax
+        run: |
+          node --check scripts/detect-conventions.js
+          node --check scripts/validate-keys.js
+      
+      # Step 4: Configurar Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      # Step 5: Instalar dependências Python
+      - name: Install Python dependencies
+        run: |
+          pip install -r scripts/requirements.txt
+          pip install pytest
+      
+      # Step 6: Validar sintaxe Python
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile scripts/translate.py
+          python -m py_compile scripts/test_translate.py
+      
+      # Step 7: Rodar testes Python
+      - name: Run Python tests
+        run: |
+          python -m pytest scripts/test_translate.py -v
+      
+      # Step 8: Verificar encoding dos arquivos markdown
+      - name: Check markdown encoding
+        run: |
+          if grep -r "ÔÇö\|ÔåÆ\|Ô" --include="*.md" .; then
+            echo "❌ Broken encoding characters found (ÔÇö, ÔåÆ, or Ô)"
+            echo "These should be replaced with — (em dash) or → (arrow)"
+            exit 1
+          fi
+          echo "✅ No broken encoding found"
